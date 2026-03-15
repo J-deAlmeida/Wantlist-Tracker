@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#fafafa;--bg2:#fff;--bg3:#f5f5f5;--tx:#1a1a1a;--tx2:#666;--tx3:#999;--bd:#e5e5e5;--bd2:#eee;--bd3:#ddd;--acc:#111;--grn:#0a7d4f;--grn2:#e6f7ee;--grn3:#096b43;--grnd:#93c9ae;--err:#c00;--errbg:#fff5f5;--errbd:#fdd}
-.dark{--bg:#161616;--bg2:#222;--bg3:#2a2a2a;--tx:#e5e5e5;--tx2:#aaa;--tx3:#777;--bd:#333;--bd2:#383838;--bd3:#444;--acc:#eee;--grn:#2ecc71;--grn2:#1a3a2a;--grn3:#27ae60;--grnd:#555;--err:#ff6b6b;--errbg:#2a1a1a;--errbd:#4a2020}
+:root{--bg:#fafafa;--bg2:#fff;--bg3:#f5f5f5;--tx:#1a1a1a;--tx2:#666;--tx3:#999;--bd:#e5e5e5;--bd2:#eee;--bd3:#ddd;--acc:#111;--grn:#0a7d4f;--grn2:#e6f7ee;--grn3:#096b43;--grnd:#93c9ae;--err:#c00;--errbg:#fff5f5;--errbd:#fdd;--amberbg:#FAEEDA;--ambertx:#854F0B}
+.dark{--bg:#161616;--bg2:#222;--bg3:#2a2a2a;--tx:#e5e5e5;--tx2:#aaa;--tx3:#777;--bd:#333;--bd2:#383838;--bd3:#444;--acc:#eee;--grn:#2ecc71;--grn2:#1a3a2a;--grn3:#27ae60;--grnd:#555;--err:#ff6b6b;--errbg:#2a1a1a;--errbd:#4a2020;--amberbg:#412402;--ambertx:#FAC775}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;transition:background .2s,color .2s}
 a{color:inherit}
 .app{max-width:960px;margin:0 auto;padding:24px 16px 60px}
@@ -53,9 +53,24 @@ label{display:block;font-size:13px;font-weight:600;color:var(--tx);margin-bottom
 .toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
 .search{padding:8px 12px;border:1px solid var(--bd3);border-radius:8px;font-size:13px;flex:1;min-width:140px;outline:none;font-family:inherit;background:var(--bg2);color:var(--tx)}
 .search:focus{border-color:var(--acc)}
-.fbtn{padding:5px 12px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--bd3);cursor:pointer;background:var(--bg2);color:var(--tx2);font-family:inherit;transition:all .15s}
+.fbtn{padding:5px 12px;font-size:12px;font-weight:600;border-radius:20px;border:0.5px solid var(--bd3);cursor:pointer;background:var(--bg2);color:var(--tx2);font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
 .fbtn:hover{border-color:var(--tx3)}
-.fbtn.on{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+.fbtn.on{background:var(--bg3);color:var(--tx);border-color:var(--acc)}
+.fbtn .fc{font-size:11px;color:var(--tx3);font-weight:400}
+.fbtn .fc span{color:var(--grn);font-weight:600}
+.fmt-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.fmt-vinyl{background:#EEEDFE;color:#534AB7}
+.fmt-cd{background:#E6F1FB;color:#185FA5}
+.fmt-cass{background:#FAEEDA;color:#854F0B}
+.fmt-file{background:#F1EFE8;color:#5F5E5A}
+.fmt-box{background:#E1F5EE;color:#0F6E56}
+.fmt-other{background:#F1EFE8;color:#5F5E5A}
+.dark .fmt-vinyl{background:#26215C;color:#AFA9EC}
+.dark .fmt-cd{background:#042C53;color:#85B7EB}
+.dark .fmt-cass{background:#412402;color:#FAC775}
+.dark .fmt-file{background:#2C2C2A;color:#B4B2A9}
+.dark .fmt-box{background:#04342C;color:#5DCAA5}
+.dark .fmt-other{background:#2C2C2A;color:#B4B2A9}
 .vtog{display:flex;border:1px solid var(--bd3);border-radius:6px;overflow:hidden;margin-left:auto;flex-shrink:0}
 .vb{padding:6px 10px;border:none;background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center}
 .vb+.vb{border-left:1px solid var(--bd3)}
@@ -106,10 +121,15 @@ label{display:block;font-size:13px;font-weight:600;color:var(--tx);margin-bottom
 .v-grid .it-ti{font-size:13px;font-weight:700;color:var(--tx);margin-top:1px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .v-grid .it-me{font-size:10px;color:var(--tx3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
-.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
 .badge a{text-decoration:underline;text-underline-offset:2px}
 .badge.oos{opacity:.6}
 .badge.oos a{text-decoration:line-through}
+.badge.diff{background:var(--amberbg) !important;color:var(--ambertx) !important}
+.badge.diff a{color:var(--ambertx) !important}
+.badge .hint{font-size:9px;font-weight:400;opacity:.7}
+.avail-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:4px;padding-top:4px;border-top:0.5px solid var(--bd2)}
+.avail-label{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.3px;margin-right:2px}
 .it-lnk{display:inline-flex;align-items:center;font-size:11px;font-weight:600;color:var(--tx3);text-decoration:none;padding:3px 8px;border:1px solid var(--bd2);border-radius:5px;transition:all .15s;background:var(--bg2);white-space:nowrap}
 .it-lnk:hover{background:var(--bg3);color:var(--tx)}
 .empty{text-align:center;padding:40px;color:var(--tx3)}
@@ -136,7 +156,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--tx);margin-bottom
   <div class="header">
     <div class="logo">Porto <span>&times;</span> Wantlist</div>
     <div class="sub">Check your Discogs wantlist across Porto's record stores</div>
-    <div class="ver">v0.1 &mdash; 2026-03-15</div>
+    <div class="ver">v3.6 &mdash; 2026-03-15</div>
   </div>
   <div id="root"></div>
   <div style="text-align:center;padding:40px 16px 20px;font-size:11px;color:var(--tx3)">&copy; 2026 Geminus Dancing Studios. Ardazubre, Baixo Mondego.</div>
@@ -409,7 +429,17 @@ function hasAnyResults(){return Object.keys(S.results).length>0}
 function isFoundAt(it,sid){return S.results[sid]&&S.results[sid][it.id]&&S.results[sid][it.id].s==="found"}
 
 /* ========== FILTERS ========== */
-function fmts(){var s={};S.items.forEach(function(it){it.format.split(",").forEach(function(f){f=f.trim();if(f)s[f]=true})});return["all"].concat(Object.keys(s)).slice(0,7)}
+function fmts(){var s={};S.items.forEach(function(it){it.format.split(",").forEach(function(f){f=f.trim();if(f)s[f]=(s[f]||0)+1})});
+  var arr=Object.keys(s).sort(function(a,b){return s[b]-s[a]}).slice(0,6);
+  return{list:["all"].concat(arr),counts:s}}
+function fmtClass(f){var l=f.toLowerCase();if(l.indexOf("vinyl")!==-1)return"fmt-vinyl";if(l==="cd")return"fmt-cd";
+  if(l.indexOf("cassette")!==-1)return"fmt-cass";if(l==="file")return"fmt-file";
+  if(l.indexOf("box")!==-1)return"fmt-box";return"fmt-other"}
+function fmtFoundCount(fmt){var c=0;S.items.forEach(function(it){
+  if(fmt!=="all"&&it.format.toLowerCase().indexOf(fmt.toLowerCase())===-1)return;
+  if(getItemStores(it).length>0)c++});return c}
+function fmtBadge(it){var f=it.format.split(",")[0].trim();if(!f)return"";
+  return'<span class="fmt-badge '+fmtClass(f)+'">'+h(f)+'</span>'}
 function filtered(){
   var q=S.search.toLowerCase(),f=S.format;
   return S.items.filter(function(it){
@@ -426,31 +456,42 @@ function imgTag(src,sz){
   if(!src)return'<div class="ph">'+svg(sz||36)+'</div>';
   return'<img src="'+h(src)+'" alt="" loading="lazy" data-sz="'+(sz||36)+'" onerror="repImg(this)">'}
 
+function isFormatUncertain(it,store){
+  /* Search-based stores match by title, not release ID — format could differ.
+     Most Porto stores primarily sell vinyl. If wantlist item is NOT vinyl,
+     a search match likely means a different format is available. */
+  if(store.type!=="web-search")return false;
+  var f=it.format.toLowerCase();
+  return f.indexOf("vinyl")===-1}
+
 function badgesHTML(it){
   var stores=getItemStores(it);if(stores.length===0)return"";
-  var o='<div class="badges">';
+  var o='';
   stores.forEach(function(s){
     var link;
     if(s.type==="discogs")link="https://www.discogs.com/sell/release/"+it.id+"?ev=rb&seller_id="+encodeURIComponent(s.seller);
     else if(s.getStoreUrl)link=s.getStoreUrl(it);else link=s.url;
     var oos=isOos(it,s.id);
-    o+='<span class="badge'+(oos?" oos":"")+'" style="background:'+s.color+'15;color:'+s.color+'">';
-    o+='<a href="'+h(link)+'" target="_blank" style="color:'+s.color+'">'+h(s.short)+'</a>';
-    if(oos)o+=' <span style="font-size:9px;opacity:.7">oos</span>';
+    var diff=isFormatUncertain(it,s);
+    o+='<span class="badge'+(oos?" oos":"")+(diff?" diff":"")+'" style="'+(diff?"":"background:"+s.color+"15;color:"+s.color)+'">';
+    o+='<a href="'+h(link)+'" target="_blank" style="'+(diff?"color:var(--ambertx)":"color:"+s.color)+'">'+h(s.short)+'</a>';
+    if(oos)o+=' <span class="hint">oos</span>';
+    if(diff)o+=' <span class="hint">\u00b7 format may differ</span>';
     o+='</span>'});
-  return o+'</div>'}
+  return o}
 
 function renderItem(it){
-  var meta=[it.label,it.year,it.format].filter(Boolean).join(" \u00b7 ");
-  var badges=badgesHTML(it);
+  var meta=[it.label,it.year,it.format.split(",")[0].trim()].filter(Boolean).join(" \u00b7 ");
+  var stores=badgesHTML(it);
+  var storeRow=stores?'<div class="avail-row"><span class="avail-label">Available at</span>'+stores+'</div>':'';
   var discLink='<a class="it-lnk" href="https://www.discogs.com/release/'+h(it.id)+'" target="_blank">Discogs</a>';
   if(S.view==="list"){
     return'<div class="it"><div class="it-iw">'+imgTag(it.thumb,24)+'</div>'+
       '<div class="it-bd"><div class="it-ar">'+h(it.artist)+'</div><div class="it-ti">'+h(it.title)+'</div>'+
-      '<div class="it-me">'+h(meta)+'</div>'+badges+'</div><div class="it-act">'+discLink+'</div></div>'}
+      '<div class="it-me">'+h(meta)+'</div>'+storeRow+'</div><div class="it-act">'+discLink+'</div></div>'}
   return'<div class="it"><div class="it-iw">'+imgTag(it.thumb,36)+'</div>'+
     '<div class="it-bd"><div class="it-ar">'+h(it.artist)+'</div><div class="it-ti">'+h(it.title)+'</div>'+
-    '<div class="it-me">'+h(meta)+'</div>'+badges+'<div style="margin-top:4px">'+discLink+'</div></div></div>'}
+    '<div class="it-me">'+h(meta)+'</div>'+storeRow+'<div style="margin-top:4px">'+discLink+'</div></div></div>'}
 
 function render(){
   if(!S.loaded&&!S.loading){
@@ -474,7 +515,7 @@ function render(){
     root.innerHTML='<div class="card empty"><div style="font-size:18px;font-weight:700;margin-bottom:8px">Wantlist is empty</div><button class="btn-sec" style="margin-top:16px" id="bb">\u2190 Back</button></div>';
     $("bb").addEventListener("click",function(){S.loaded=false;render()});return}
 
-  var fl=filtered(),fm=fmts(),sh=fl.slice(0,S.vis),more=sh.length<fl.length;
+  var fl=filtered(),sh=fl.slice(0,S.vis),more=sh.length<fl.length;
   var artc={};S.items.forEach(function(i){artc[i.artist]=true});
   var tf=totalFound(),hc=hasAnyResults();
   var o='';
@@ -523,10 +564,20 @@ function render(){
     o+='</div>'}
 
   /* Toolbar */
+  var fmtData=fmts(),fmList=fmtData.list,fmCounts=fmtData.counts;
   o+='<div class="toolbar"><input class="search" id="isrch" placeholder="Search artist, title, label\u2026" value="'+h(S.search)+'" autocomplete="off">';
-  fm.forEach(function(f){o+='<button class="fbtn'+(S.format===f?' on':'')+'" data-f="'+h(f)+'">'+(f==="all"?"All":h(f))+'</button>'});
   o+='<div class="vtog"><button class="vb'+(S.view==="grid"?' on':'')+'" data-v="grid" title="Grid">'+IG+'</button>'+
     '<button class="vb'+(S.view==="list"?' on':'')+'" data-v="list" title="List">'+IL+'</button></div></div>';
+  o+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">';
+  fmList.forEach(function(f){
+    var cnt=f==="all"?S.items.length:(fmCounts[f]||0);
+    var fc=hc?fmtFoundCount(f):0;
+    o+='<button class="fbtn'+(S.format===f?' on':'')+'" data-f="'+h(f)+'">';
+    o+=(f==="all"?"All":h(f));
+    o+=' <span class="fc">'+cnt;
+    if(fc>0)o+=' &middot; <span>'+fc+' found</span>';
+    o+='</span></button>'});
+  o+='</div>';
 
   o+='<div class="v-'+S.view+'">';sh.forEach(function(it){o+=renderItem(it)});o+='</div>';
   if(more)o+='<div class="more"><button class="btn-sec" id="bmo">Show more ('+(fl.length-sh.length)+' remaining)</button></div>';
