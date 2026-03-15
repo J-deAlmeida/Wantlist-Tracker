@@ -39,6 +39,9 @@ export default {
 
     try {
       const isJson = target.includes(".json");
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+
       const resp = await fetch(target, {
         headers: {
           "User-Agent": "Mozilla/5.0 (compatible; PortoWantlistTracker/2.1)",
@@ -47,7 +50,10 @@ export default {
             : "text/html,application/xhtml+xml",
         },
         redirect: "follow",
+        signal: controller.signal,
       });
+
+      clearTimeout(timeout);
 
       const body = await resp.text();
       const ct = resp.headers.get("content-type") || "";
