@@ -1,40 +1,21 @@
 // ============================================================
-// Porto Wantlist Tracker — Cloudflare Worker (v2.0)
+// Porto Wantlist Tracker — Cloudflare Worker (v2.1)
 // ============================================================
-// Generalized CORS proxy for checking record store websites.
-// Discogs marketplace checks go direct from the frontend
-// (no proxy needed — Discogs API supports browser CORS).
-//
-// Deploy: wrangler deploy
+// CORS proxy for checking record store websites.
+// Supports both direct product page checks and search page checks.
+// Returns extracted signals + bodyText for search matching.
 // ============================================================
 
 const ALLOWED_DOMAINS = new Set([
-  // 8mm Records
-  "www.8mm-records.com",
-  "8mm-records.com",
-  // Louie Louie (Magento)
-  "www.louielouie.pt",
-  "louielouie.pt",
-  // Matéria Prima (also has Discogs seller — web check is backup)
-  "www.materiaprima.pt",
-  "materiaprima.pt",
-  // Porto Calling
-  "portocalling.com",
-  "www.portocalling.com",
-  // Music and Riots (Shopify)
-  "shopmusicandriots.com",
-  "www.shopmusicandriots.com",
-  // Socorro
-  "socorro.pt",
-  "www.socorro.pt",
-  // Tubitek (via CDGO platform)
-  "cdgo.com",
-  "www.cdgo.com",
-  "tubitek.pt",
-  "www.tubitek.pt",
-  // Discos do Baú
-  "discosdobau.pt",
-  "www.discosdobau.pt",
+  "www.8mm-records.com", "8mm-records.com",
+  "www.louielouie.pt", "louielouie.pt",
+  "www.materiaprima.pt", "materiaprima.pt",
+  "portocalling.com", "www.portocalling.com",
+  "shopmusicandriots.com", "www.shopmusicandriots.com",
+  "socorro.pt", "www.socorro.pt",
+  "cdgo.com", "www.cdgo.com",
+  "tubitek.pt", "www.tubitek.pt",
+  "discosdobau.pt", "www.discosdobau.pt",
 ]);
 
 export default {
@@ -46,64 +27,72 @@ export default {
     const { searchParams } = new URL(request.url);
     const target = searchParams.get("url");
 
-    if (!target) {
-      return json({ error: "Missing ?url= parameter" }, 400);
-    }
+    if (!target) return json({ error: "Missing ?url= parameter" }, 400);
 
     let parsed;
-    try {
-      parsed = new URL(target);
-    } catch {
-      return json({ error: "Invalid URL" }, 400);
-    }
+    try { parsed = new URL(target); }
+    catch { return json({ error: "Invalid URL" }, 400); }
 
     if (!ALLOWED_DOMAINS.has(parsed.hostname)) {
       return json({ error: `Domain not allowed: ${parsed.hostname}` }, 403);
     }
 
     try {
+      const isJson = target.includes(".json");
       const resp = await fetch(target, {
         headers: {
-          "User-Agent":
-            "Mozilla/5.0 (compatible; PortoWantlistTracker/2.0)",
-          Accept: "text/html,application/xhtml+xml",
+          "User-Agent": "Mozilla/5.0 (compatible; PortoWantlistTracker/2.1)",
+          "Accept": isJson
+            ? "application/json"
+            : "text/html,application/xhtml+xml",
         },
         redirect: "follow",
       });
 
-      const html = await resp.text();
+      const body = await resp.text();
+      const ct = resp.headers.get("content-type") || "";
 
-      // --- Extract common page signals ---
-      const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+      // --- JSON response (Shopify search endpoints) ---
+      if (ct.includes("application/json") || ct.includes("text/json") || isJson) {
+        try {
+          const jsonData = JSON.parse(body);
+          return json({ json: jsonData, status: resp.status, finalUrl: resp.url });
+        } catch { /* fall through to HTML handling */ }
+      }
+
+      // --- HTML response ---
+      const titleMatch = body.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
       const title = titleMatch ? titleMatch[1].trim() : "";
 
-      const hasBasket = /add.to.(basket|cart|carrinho)/i.test(html);
+      const hasBasket = /add.to.(basket|cart|carrinho)/i.test(body);
       const hasPrice =
-        /"price"/i.test(html) ||
-        /€\s*\d/.test(html) ||
-        /\d+[.,]\d{2}\s*€/.test(html);
-      const hasBuyButton = /\b(buy|comprar|adicionar|add to)\b/i.test(html);
+        /"price"/i.test(body) ||
+        /€\s*\d/.test(body) ||
+        /\d+[.,]\d{2}\s*€/.test(body);
+      const hasBuyButton = /\b(buy|comprar|adicionar|add to)\b/i.test(body);
       const hasOutOfStock =
-        /out.of.stock|esgotado|fora.de.stock|indispon/i.test(html);
+        /out.of.stock|esgotado|fora.de.stock|indispon/i.test(body);
 
-      // --- Extra: grab meta description and og:title for richer matching ---
       const metaDesc =
-        html.match(
-          /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)/i
-        )?.[1] || "";
+        body.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)/i)?.[1] || "";
       const ogTitle =
-        html.match(
-          /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']*)/i
-        )?.[1] || "";
+        body.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']*)/i)?.[1] || "";
+
+      // --- Body text for search result matching ---
+      const bodyText = body
+        .replace(/<script[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style[\s\S]*?<\/style>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&[a-z]+;/gi, " ")
+        .replace(/&#\d+;/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 10000);
 
       return json({
-        title,
-        ogTitle,
-        metaDesc,
-        hasBasket,
-        hasPrice,
-        hasBuyButton,
-        hasOutOfStock,
+        title, ogTitle, metaDesc,
+        hasBasket, hasPrice, hasBuyButton, hasOutOfStock,
+        bodyText,
         status: resp.status,
         finalUrl: resp.url,
       });
@@ -112,8 +101,6 @@ export default {
     }
   },
 };
-
-// --- Helpers ---
 
 function cors(response) {
   response.headers.set("Access-Control-Allow-Origin", "*");
