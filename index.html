@@ -34,7 +34,7 @@ label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
 .btn-green:disabled{background:#93c9ae;cursor:not-allowed}
 .btn-row{margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .progress-text{font-size:12px;color:#666}
-.pbar{background:#f0f0f0;border-radius:4px;height:6px;overflow:hidden;margin-top:6px}
+.pbar{background:#f0f0f0;border-radius:4px;height:6px;overflow:hidden;margin-top:6px;width:100%}
 .pfill{height:100%;border-radius:4px;transition:width .3s ease}
 .pfill-dark{background:#111}
 .pfill-green{background:#0a7d4f}
@@ -56,7 +56,11 @@ label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
 .vb.on{background:#111}
 .vb.on svg *{stroke:#fff}
 .vb svg{width:16px;height:16px;stroke:#666;stroke-width:2;fill:none}
-.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:12px 0}
+.store-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.store-hdr-btns{display:flex;gap:6px}
+.store-hdr-btns button{font-size:11px;color:#666;background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:2px}
+.store-hdr-btns button:hover{color:#111}
+.store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:12px}
 .store-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #e5e5e5;border-radius:8px;cursor:pointer;transition:all .15s;background:#fff;font-size:12px}
 .store-opt:hover{border-color:#aaa}
 .store-opt.on{border-color:#111;background:#f8f8f8}
@@ -64,9 +68,10 @@ label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
 .store-opt .sn{font-weight:600;color:#111;flex:1}
 .store-opt .st{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.3px}
 .store-opt input{display:none}
-.check-bar{background:#fff;border:1px solid #e5e5e5;border-radius:10px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.check-bar .pw{flex:1;min-width:200px}
-.dig-msg{font-size:12px;color:#888;font-style:italic;margin-top:4px;min-height:16px}
+/* Check progress area — fixed layout */
+.check-area{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.check-progress{flex:1;min-width:250px;max-width:500px}
+.dig-msg{font-size:12px;color:#888;font-style:italic;margin-top:4px;height:16px;overflow:hidden}
 .v-list .it{background:#fff;border:1px solid #e8e8e8;border-radius:8px;display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:8px;transition:box-shadow .2s}
 .v-list .it:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
 .v-list .it-iw{width:52px;height:52px;flex-shrink:0;border-radius:6px;overflow:hidden;background:#f5f5f5;position:relative}
@@ -100,7 +105,8 @@ label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
 .more{text-align:center;padding:20px}
 .vinyl{opacity:.15}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.spinner{display:inline-block;animation:spin 2s linear infinite;flex-shrink:0}
+.spinner{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;animation:spin 2s linear infinite}
+.spinner svg{display:block}
 .store-stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .store-stat{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #eee;border-radius:8px;background:#fff;font-size:12px;font-weight:600}
 .store-stat .dot{width:8px;height:8px;border-radius:50%}
@@ -109,7 +115,6 @@ label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
 @media(max-width:600px){
   .v-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
   .v-list .it{flex-wrap:wrap}
-  .check-bar{flex-direction:column;align-items:stretch}
   .store-grid{grid-template-columns:1fr 1fr}
 }
 </style>
@@ -119,7 +124,7 @@ label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
   <div class="header">
     <div class="logo">Porto <span>&times;</span> Wantlist</div>
     <div class="sub">Check your Discogs wantlist across Porto's record stores</div>
-    <div class="ver">v2.0 &mdash; 2026-03-15 search-based checking</div>
+    <div class="ver">v2.1 &mdash; 2026-03-15 tighter matching + UX fixes</div>
   </div>
   <div id="root"></div>
 </div>
@@ -137,13 +142,11 @@ function slug(t){return(t||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(
 function norm(s){return(s||"").toLowerCase()
   .replace(/[\u00e0-\u00e5]/g,"a").replace(/[\u00e8-\u00eb]/g,"e")
   .replace(/[\u00ec-\u00ef]/g,"i").replace(/[\u00f2-\u00f6]/g,"o")
-  .replace(/[\u00f9-\u00fc]/g,"u").replace(/[\u00f1]/g,"n")
-  .replace(/[\u00e7]/g,"c")
+  .replace(/[\u00f9-\u00fc]/g,"u").replace(/[\u00f1]/g,"n").replace(/[\u00e7]/g,"c")
   .replace(/[^a-z0-9]/g," ").replace(/\s+/g," ").trim()}
 function qry(it){
   var a=it.artist.replace(/\s*\(\d+\)\s*$/,"").replace(/\s*,\s*$/,"").trim();
-  var t=it.title.trim();
-  return a+" "+t}
+  return a+" "+it.title.trim()}
 function textMatch(body,artist,title){
   var b=norm(body),a=norm(artist),t=norm(title);
   if(a.length<2||t.length<2)return false;
@@ -151,20 +154,9 @@ function textMatch(body,artist,title){
 
 /* ========== STORE REGISTRY ========== */
 var STORES=[
-  /* --- DISCOGS SELLERS (inventory match) --- */
-  {id:"bunker",name:"Bunker Store",short:"Bunker",type:"discogs",
-   seller:"PerAngustaAdAugusta",color:"#534AB7",
-   url:"https://www.discogs.com/seller/PerAngustaAdAugusta/profile"},
-  {id:"circus",name:"Circus Records",short:"Circus",type:"discogs",
-   seller:"CircusRecordShop",color:"#D85A30",
-   url:"https://www.discogs.com/seller/CircusRecordShop/profile"},
-  {id:"piranha",name:"Piranha",short:"Piranha",type:"discogs",
-   seller:"PIRANHACD",color:"#993556",
-   url:"https://www.discogs.com/seller/PIRANHACD/profile"},
-
-  /* --- DIRECT WEB CHECK (8mm style) --- */
+  /* --- WEB: DIRECT URL CHECK --- */
   {id:"8mm",name:"8mm Records",short:"8mm",type:"web",color:"#111",
-   url:"https://www.8mm-records.com",
+   url:"https://www.8mm-records.com",defOn:true,
    getCheckUrl:function(it){return"https://www.8mm-records.com/release/"+it.id+"/"+slug(it.artist+"-"+it.title)},
    detect:function(j,it){
      if(j.title&&j.title.length>20){var l=j.title.toLowerCase();
@@ -172,57 +164,72 @@ var STORES=[
      if(j.hasBasket||j.hasPrice)return"found";return"no"},
    getStoreUrl:function(it){return"https://www.8mm-records.com/release/"+it.id+"/"+slug(it.artist+"-"+it.title)}},
 
-  /* --- SEARCH-BASED WEB STORES (HTML) --- */
+  /* --- WEB: SEARCH (HTML) --- */
   {id:"materia",name:"Matéria Prima",short:"Matéria",type:"web-search",color:"#0F6E56",
-   url:"https://www.materiaprima.pt",
+   url:"https://www.materiaprima.pt",defOn:true,
    getCheckUrl:function(it){return"https://www.materiaprima.pt/lista.php?search="+encodeURIComponent(qry(it))},
    detect:function(j,it){
      if(!j.bodyText)return"err";
-     if(textMatch(j.bodyText,it.artist,it.title)){
-       var b=norm(j.bodyText);
-       if(b.indexOf("buy")!==-1||b.indexOf("comprar")!==-1||j.hasPrice)return"found"}
+     /* Their search page always has recommendations with "Buy" buttons.
+        Match only if both artist AND title appear in the body — but also check
+        that the title isn't just in the nav/header noise. Require proximity:
+        both must appear within 500 chars of each other. */
+     var b=norm(j.bodyText),a=norm(it.artist),t=norm(it.title);
+     if(a.length<2||t.length<2)return"no";
+     var ai=b.indexOf(a),ti=b.indexOf(t);
+     if(ai===-1||ti===-1)return"no";
+     if(Math.abs(ai-ti)<500)return"found";
      return"no"},
    getStoreUrl:function(it){return"https://www.materiaprima.pt/lista.php?search="+encodeURIComponent(qry(it))}},
 
   {id:"portocalling",name:"Porto Calling",short:"PtCalling",type:"web-search",color:"#639922",
-   url:"https://portocalling.com",
+   url:"https://portocalling.com",defOn:true,
    getCheckUrl:function(it){return"https://portocalling.com/en/?s="+encodeURIComponent(qry(it))+"&post_type=product"},
    detect:function(j,it){
      if(!j.bodyText)return"err";
-     if(textMatch(j.bodyText,it.artist,it.title)){
-       if(j.hasPrice||j.hasBasket||norm(j.bodyText).indexOf("add to cart")!==-1)return"found"}
+     var b=norm(j.bodyText);
+     /* WooCommerce shows "no products were found" when search has no results */
+     if(b.indexOf("no products")!==-1||b.indexOf("nenhum produto")!==-1||b.indexOf("no results")!==-1)return"no";
+     /* Require title in page title or og:title (not just body — body has too much noise) */
+     var pt=norm(j.title||"")+"|"+norm(j.ogTitle||"");
+     var ti=norm(it.title);
+     if(ti.length>3&&pt.indexOf(ti)!==-1)return"found";
+     /* Fallback: check if result count is shown and > 0, and title appears near artist */
+     var rMatch=j.bodyText.match(/(\d+)\s*result/i);
+     if(rMatch&&parseInt(rMatch[1])===0)return"no";
+     if(rMatch&&parseInt(rMatch[1])>0&&textMatch(j.bodyText,it.artist,it.title))return"found";
      return"no"},
    getStoreUrl:function(it){return"https://portocalling.com/en/?s="+encodeURIComponent(qry(it))+"&post_type=product"}},
 
   {id:"socorro",name:"Socorro",short:"Socorro",type:"web-search",color:"#A32D2D",
-   url:"https://socorro.pt",
+   url:"https://socorro.pt",defOn:true,
    getCheckUrl:function(it){return"https://socorro.pt/en/search?q="+encodeURIComponent(qry(it))},
    detect:function(j,it){
      if(!j.bodyText)return"err";
-     if(textMatch(j.bodyText,it.artist,it.title)){
-       if(j.hasPrice||norm(j.bodyText).indexOf("add to cart")!==-1||norm(j.bodyText).indexOf("comprar")!==-1)return"found"}
+     var b=norm(j.bodyText);
+     if(b.indexOf("no results")!==-1||b.indexOf("sem resultados")!==-1||b.indexOf("search new products")!==-1)return"no";
+     /* Only match if both artist AND title appear, and page has a price */
+     if(textMatch(j.bodyText,it.artist,it.title)&&j.hasPrice)return"found";
      return"no"},
    getStoreUrl:function(it){return"https://socorro.pt/en/search?q="+encodeURIComponent(qry(it))}},
 
-  /* --- SEARCH-BASED WEB STORES (Shopify) --- */
+  /* --- WEB: SEARCH (Shopify JSON) --- */
   {id:"musicriots",name:"Music and Riots",short:"M&R",type:"web-search",color:"#854F0B",
-   url:"https://shopmusicandriots.com",
+   url:"https://shopmusicandriots.com",defOn:true,
    getCheckUrl:function(it){return"https://shopmusicandriots.com/search/suggest.json?q="+encodeURIComponent(qry(it))+"&resources[type]=product&limit=6"},
    detect:function(j,it){
-     /* Shopify JSON response */
      if(j.json){
        var prods=(j.json.resources&&j.json.resources.results&&j.json.resources.results.products)||[];
        for(var i=0;i<prods.length;i++){
          var pt=norm(prods[i].title||"");
          if(pt.indexOf(norm(it.title))!==-1||pt.indexOf(norm(it.artist))!==-1)return"found"}
        return"no"}
-     /* Fallback to bodyText if not JSON */
      if(j.bodyText&&textMatch(j.bodyText,it.artist,it.title)&&j.hasPrice)return"found";
      return"no"},
    getStoreUrl:function(it){return"https://shopmusicandriots.com/search?q="+encodeURIComponent(qry(it))+"&type=product"}},
 
   {id:"discosdobau",name:"Discos do Baú",short:"Baú",type:"web-search",color:"#712B13",
-   url:"https://discosdobau.pt",
+   url:"https://discosdobau.pt",defOn:true,
    getCheckUrl:function(it){return"https://discosdobau.pt/en/search/suggest.json?q="+encodeURIComponent(qry(it))+"&resources[type]=product&limit=6"},
    detect:function(j,it){
      if(j.json){
@@ -234,6 +241,17 @@ var STORES=[
      if(j.bodyText&&textMatch(j.bodyText,it.artist,it.title)&&j.hasPrice)return"found";
      return"no"},
    getStoreUrl:function(it){return"https://discosdobau.pt/en/search?q="+encodeURIComponent(qry(it))+"&type=product"}},
+
+  /* --- DISCOGS SELLERS (slow — off by default) --- */
+  {id:"bunker",name:"Bunker Store",short:"Bunker",type:"discogs",
+   seller:"PerAngustaAdAugusta",color:"#534AB7",defOn:false,
+   url:"https://www.discogs.com/seller/PerAngustaAdAugusta/profile"},
+  {id:"circus",name:"Circus Records",short:"Circus",type:"discogs",
+   seller:"CircusRecordShop",color:"#D85A30",defOn:false,
+   url:"https://www.discogs.com/seller/CircusRecordShop/profile"},
+  {id:"piranha",name:"Piranha",short:"Piranha",type:"discogs",
+   seller:"PIRANHACD",color:"#993556",defOn:false,
+   url:"https://www.discogs.com/seller/PIRANHACD/profile"},
 
   /* --- COMING SOON --- */
   {id:"louie",name:"Louie Louie",short:"Louie",type:"web-tbd",color:"#185FA5",
@@ -253,7 +271,7 @@ var S={
   checkPhase:"",checkStore:"",checkProg:null,
   results:{},invCache:{},onlyFound:false,
   user:"",token:""};
-CHECKABLE.forEach(function(s){S.selectedStores[s.id]=true});
+CHECKABLE.forEach(function(s){S.selectedStores[s.id]=!!s.defOn});
 try{S.user=sessionStorage.getItem("dg_u")||"";S.token=sessionStorage.getItem("dg_t")||""}catch(e){}
 function saveCreds(){try{sessionStorage.setItem("dg_u",S.user);sessionStorage.setItem("dg_t",S.token)}catch(e){}}
 
@@ -263,6 +281,7 @@ function wait(ms){return new Promise(function(r){setTimeout(r,ms)})}
 function $(id){return document.getElementById(id)}
 function svg(sz){sz=sz||36;return'<svg class="vinyl" width="'+sz+'" height="'+sz+'" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#aaa" stroke-width="1.5" fill="none"/><circle cx="24" cy="24" r="8" stroke="#aaa" stroke-width="1.5" fill="none"/><circle cx="24" cy="24" r="2" fill="#bbb"/></svg>'}
 function spinSvg(){return'<span class="spinner"><svg width="20" height="20" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#0a7d4f" stroke-width="2" fill="none" opacity=".3"/><circle cx="24" cy="24" r="22" stroke="#0a7d4f" stroke-width="2" fill="none" stroke-dasharray="40 100" stroke-linecap="round"/></svg></span>'}
+
 var DIG_MSGS=[
   "Flipping through dusty Kallax furniture\u2026",
   "Trying not to fall from the ladder\u2026",
@@ -277,8 +296,14 @@ var DIG_MSGS=[
   "Someone just put on a killer B-side\u2026",
   "Asking the clerk for recommendations\u2026",
   "Debating if VG+ is good enough\u2026",
-  "Running fingers across the spines\u2026"];
-var digIdx=Math.floor(Math.random()*DIG_MSGS.length);
+  "Running fingers across the spines\u2026",
+  "That new vinyl smell though\u2026",
+  "Trying to read Japanese liner notes\u2026",
+  "The bass on this pressing is insane\u2026",
+  "Contemplating a double album purchase\u2026"];
+/* Shuffle on load */
+for(var _i=DIG_MSGS.length-1;_i>0;_i--){var _j=Math.floor(Math.random()*(_i+1));var _t=DIG_MSGS[_i];DIG_MSGS[_i]=DIG_MSGS[_j];DIG_MSGS[_j]=_t}
+var digIdx=0;
 function nextDig(){digIdx=(digIdx+1)%DIG_MSGS.length;return DIG_MSGS[digIdx]}
 
 /* ========== DISCOGS WANTLIST FETCH ========== */
@@ -289,7 +314,7 @@ async function fetchWL(){
   var pg=1,all=[],tp=1,tot=0;
   try{
     while(pg<=tp){
-      var hd={"User-Agent":"PortoWantlistTracker/2.0"};
+      var hd={"User-Agent":"PortoWantlistTracker/2.1"};
       if(S.token)hd["Authorization"]="Discogs token="+S.token;
       var url=API+"/users/"+encodeURIComponent(S.user)+"/wants?per_page=100&page="+pg+"&sort=added&sort_order=desc";
       var r=await fetch(url,{headers:hd});
@@ -322,7 +347,7 @@ async function fetchSellerInventory(seller){
   if(S.invCache[seller])return S.invCache[seller];
   var ids=new Set(),pg=1,tp=1,tot=0;
   while(pg<=tp){
-    var hd={"User-Agent":"PortoWantlistTracker/2.0"};
+    var hd={"User-Agent":"PortoWantlistTracker/2.1"};
     var url=API+"/users/"+encodeURIComponent(seller)+"/inventory?per_page=100&page="+pg+"&sort=listed&sort_order=desc";
     if(S.token)url+="&token="+encodeURIComponent(S.token);
     var r=await fetch(url,{headers:hd});
@@ -333,7 +358,7 @@ async function fetchSellerInventory(seller){
     tp=d.pagination?d.pagination.pages:1;
     tot=d.pagination?d.pagination.items:0;
     (d.listings||[]).forEach(function(l){if(l.release&&l.release.id)ids.add(String(l.release.id))});
-    S.checkProg={done:ids.size,tot:tot,found:0,pg:pg,tp:tp};
+    S.checkProg={done:ids.size,tot:tot};
     var pt=$("chkprog");if(pt)pt.textContent="Page "+pg+"/"+tp+" \u2014 "+ids.size+"/"+tot+" items loaded";
     var pf=$("chkfill");if(pf)pf.style.width=(pg/Math.max(tp,1)*100)+"%";
     pg++;if(pg<=tp)await wait(1050)}
@@ -348,10 +373,10 @@ async function checkDiscogsStore(store){
     S.items.forEach(function(it){
       if(ids.has(it.id)){S.results[store.id][it.id]="found";fc++}
       else{S.results[store.id][it.id]="no"}});
-    console.log("[discogs] "+store.name+": "+fc+" found (inventory: "+ids.size+" items)")
+    console.log("[discogs] "+store.name+": "+fc+" found (inventory: "+ids.size+")")
   }catch(e){console.log("[discogs] "+store.name+" error: "+e.message)}}
 
-/* ========== STRATEGY B: WEB CHECK (direct + search) ========== */
+/* ========== STRATEGY B: WEB CHECK ========== */
 async function checkWebItem(store,it){
   var url=store.getCheckUrl(it);
   var endpoint=WORKER+"?url="+encodeURIComponent(url);
@@ -359,9 +384,9 @@ async function checkWebItem(store,it){
     var r=await fetch(endpoint);
     if(!r.ok)return"err";
     var j=await r.json();
-    if(j.error){console.log("[web] "+store.id+" error: "+j.error);return"err"}
+    if(j.error){console.log("[web] "+store.id+": "+j.error);return"err"}
     return store.detect(j,it)
-  }catch(e){console.log("[web] "+store.id+" fetch error: "+e.message);return"err"}}
+  }catch(e){console.log("[web] "+store.id+" error: "+e.message);return"err"}}
 
 async function checkWebStore(store){
   S.checkPhase="web";S.checkStore=store.name;
@@ -379,7 +404,6 @@ async function checkWebStore(store){
     S.checkProg={done:done,tot:tot,found:fc};
     var pt=$("chkprog");if(pt)pt.textContent=done+"/"+tot+" checked ("+fc+" found)";
     var pf=$("chkfill");if(pf)pf.style.width=(done/Math.max(tot,1)*100)+"%";
-    var dm=$("digmsg");if(dm&&done%8===0)dm.textContent=nextDig();
     if(queue.length>0&&!S.cabort)await wait(250)}}
 
 /* ========== CHECK ALL ========== */
@@ -387,13 +411,14 @@ async function checkAll(){
   S.checking=true;S.cabort=false;S.results={};render();
   var digTimer=setInterval(function(){var el=$("digmsg");if(el)el.textContent=nextDig()},3500);
   var selected=CHECKABLE.filter(function(s){return S.selectedStores[s.id]});
-  var discogsStores=selected.filter(function(s){return s.type==="discogs"});
+  /* Web stores first (fast), then Discogs sellers (slow) */
   var webStores=selected.filter(function(s){return s.type==="web"||s.type==="web-search"});
+  var discogsStores=selected.filter(function(s){return s.type==="discogs"});
 
-  for(var i=0;i<discogsStores.length&&!S.cabort;i++){
-    await checkDiscogsStore(discogsStores[i]);render()}
   for(var j=0;j<webStores.length&&!S.cabort;j++){
     await checkWebStore(webStores[j]);render()}
+  for(var i=0;i<discogsStores.length&&!S.cabort;i++){
+    await checkDiscogsStore(discogsStores[i]);render()}
 
   clearInterval(digTimer);
   S.checking=false;S.checkPhase="";S.checkStore="";S.checkProg=null;render()}
@@ -512,13 +537,16 @@ function render(){
       if(fc>0)o+='<div class="store-stat"><div class="dot" style="background:'+s.color+'"></div>'+h(s.short)+' <span class="cnt">'+fc+'</span></div>'});
     o+='</div>'}
 
-  o+='<div class="card"><div style="font-size:14px;font-weight:700;margin-bottom:8px">Stores to check</div>';
+  /* Store selector */
+  o+='<div class="card">';
+  o+='<div class="store-hdr"><div style="font-size:14px;font-weight:700">Stores to check</div>';
+  o+='<div class="store-hdr-btns"><button id="bsa">Select all</button><button id="bsd">Deselect all</button></div></div>';
   o+='<div class="store-grid">';
   STORES.forEach(function(s){
     var checkable=s.type!=="web-tbd";
     var checked=S.selectedStores[s.id];
     var tbd=s.type==="web-tbd";
-    var typeLabel=s.type==="discogs"?"Discogs seller":s.type==="web"?"Website":s.type==="web-search"?"Website search":"Coming soon";
+    var typeLabel=s.type==="discogs"?"Discogs \u00b7 Slow":s.type==="web"?"Website":s.type==="web-search"?"Search":"Coming soon";
     o+='<label class="store-opt'+(checked&&checkable?' on':'')+(tbd?' disabled':'')+'" style="'+(tbd?'opacity:.5;cursor:default':'')+'">';
     o+='<div class="dot" style="background:'+s.color+'"></div>';
     o+='<div style="flex:1"><div class="sn">'+h(s.name)+'</div><div class="st">'+typeLabel+'</div></div>';
@@ -526,24 +554,30 @@ function render(){
     o+='</label>'});
   o+='</div>';
 
+  /* Check button + progress */
   o+='<div class="btn-row">';
   if(!S.checking){
     o+='<button class="btn-green" id="bch">'+(hc?'\u21BB Re-check stores':'\u2713 Check selected stores')+'</button>';
     if(hc&&tf>0)o+='<button class="fbtn'+(S.onlyFound?' on':'')+'" id="btf">Only found ('+tf+')</button>'}
   else{
-    o+='<button class="btn-sec btn-sm" id="bst">\u25A0 Stop</button>'+spinSvg()+
-      '<div class="pw"><div class="phase-label" id="chkphase">'+(S.checkPhase==="discogs"?"Loading inventory: ":"Searching: ")+h(S.checkStore)+'</div>'+
-      '<div class="progress-text" id="chkprog">Starting\u2026</div>'+
-      '<div class="pbar"><div class="pfill pfill-green" id="chkfill" style="width:0%"></div></div>'+
-      '<div class="dig-msg" id="digmsg">'+h(DIG_MSGS[digIdx])+'</div></div>'}
+    o+='<button class="btn-sec btn-sm" id="bst">\u25A0 Stop</button>';
+    o+=spinSvg();
+    o+='<div class="check-progress">';
+    o+='<div class="phase-label" id="chkphase">'+(S.checkPhase==="discogs"?"Loading inventory: ":"Searching: ")+h(S.checkStore)+'</div>';
+    o+='<div class="progress-text" id="chkprog">Starting\u2026</div>';
+    o+='<div class="pbar"><div class="pfill pfill-green" id="chkfill" style="width:0%"></div></div>';
+    o+='<div class="dig-msg" id="digmsg">'+h(DIG_MSGS[digIdx])+'</div>';
+    o+='</div>'}
   o+='</div></div>';
 
+  /* Toolbar */
   o+='<div class="toolbar"><input class="search" id="isrch" placeholder="Search artist, title, label\u2026" value="'+h(S.search)+'" autocomplete="off">';
   fm.forEach(function(f){o+='<button class="fbtn'+(S.format===f?' on':'')+'" data-f="'+h(f)+'">'+(f==="all"?"All":h(f))+'</button>'});
   o+='<div class="vtog">'+
     '<button class="vb'+(S.view==="grid"?' on':'')+'" data-v="grid" title="Grid">'+IG+'</button>'+
     '<button class="vb'+(S.view==="list"?' on':'')+'" data-v="list" title="List">'+IL+'</button></div></div>';
 
+  /* Items */
   o+='<div class="v-'+S.view+'">';
   sh.forEach(function(it){o+=renderItem(it)});
   o+='</div>';
@@ -552,6 +586,7 @@ function render(){
 
   root.innerHTML=o;
 
+  /* --- EVENT LISTENERS --- */
   $("brs").addEventListener("click",function(){S.loaded=false;S.items=[];S.error=null;S.results={};S.invCache={};render()});
   $("brl").addEventListener("click",function(){if(S.user)fetchWL()});
   var isrch=$("isrch");
@@ -560,6 +595,8 @@ function render(){
   document.querySelectorAll("[data-f]").forEach(function(b){b.addEventListener("click",function(){S.format=b.getAttribute("data-f");S.vis=PER_PAGE;render()})});
   document.querySelectorAll("[data-v]").forEach(function(b){b.addEventListener("click",function(){S.view=b.getAttribute("data-v");render()})});
   document.querySelectorAll("[data-sid]").forEach(function(cb){cb.addEventListener("change",function(){S.selectedStores[cb.getAttribute("data-sid")]=cb.checked;render()})});
+  var bsa=$("bsa");if(bsa)bsa.addEventListener("click",function(){CHECKABLE.forEach(function(s){S.selectedStores[s.id]=true});render()});
+  var bsd=$("bsd");if(bsd)bsd.addEventListener("click",function(){CHECKABLE.forEach(function(s){S.selectedStores[s.id]=false});render()});
   var bmo=$("bmo");if(bmo)bmo.addEventListener("click",function(){S.vis+=PER_PAGE;render()});
   var bch=$("bch");if(bch)bch.addEventListener("click",function(){checkAll()});
   var bst=$("bst");if(bst)bst.addEventListener("click",function(){S.cabort=true});
