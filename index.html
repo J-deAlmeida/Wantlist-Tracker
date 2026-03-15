@@ -7,112 +7,120 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#fafafa;color:#1a1a1a;min-height:100vh}
+:root{--bg:#fafafa;--bg2:#fff;--bg3:#f5f5f5;--tx:#1a1a1a;--tx2:#666;--tx3:#999;--bd:#e5e5e5;--bd2:#eee;--bd3:#ddd;--acc:#111;--grn:#0a7d4f;--grn2:#e6f7ee;--grn3:#096b43;--grnd:#93c9ae;--err:#c00;--errbg:#fff5f5;--errbd:#fdd}
+.dark{--bg:#161616;--bg2:#222;--bg3:#2a2a2a;--tx:#e5e5e5;--tx2:#aaa;--tx3:#777;--bd:#333;--bd2:#383838;--bd3:#444;--acc:#eee;--grn:#2ecc71;--grn2:#1a3a2a;--grn3:#27ae60;--grnd:#555;--err:#ff6b6b;--errbg:#2a1a1a;--errbd:#4a2020}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;transition:background .2s,color .2s}
 a{color:inherit}
 .app{max-width:960px;margin:0 auto;padding:24px 16px 60px}
 .header{text-align:center;margin-bottom:32px}
-.logo{font-size:28px;font-weight:800;letter-spacing:-.5px;color:#111}
-.logo span{color:#888;font-weight:400}
-.sub{font-size:13px;color:#888;margin-top:4px}
-.ver{font-size:11px;color:#bbb;margin-top:6px;font-family:monospace}
-.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:24px;margin-bottom:20px}
+.logo{font-size:28px;font-weight:800;letter-spacing:-.5px;color:var(--acc)}
+.logo span{color:var(--tx3);font-weight:400}
+.sub{font-size:13px;color:var(--tx3);margin-top:4px}
+.ver{font-size:11px;color:var(--tx3);margin-top:6px;font-family:monospace}
+.dm-toggle{position:absolute;top:16px;right:16px;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:16px;line-height:1}
+.dm-toggle:hover{border-color:var(--tx3)}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:24px;margin-bottom:20px;transition:background .2s,border-color .2s}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:600px){.form-row{grid-template-columns:1fr}}
-label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
-.inp{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none;transition:border .2s;font-family:inherit;background:#fff;color:#1a1a1a}
-.inp:focus{border-color:#111}
-.help{font-size:12px;color:#888;margin-top:4px}
-.help a{color:#111;font-weight:600}
-.btn{background:#111;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
-.btn:hover{background:#333}
-.btn:disabled{background:#999;cursor:not-allowed}
-.btn-sec{background:#fff;color:#111;border:1px solid #ddd;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
-.btn-sec:hover{background:#f5f5f5}
+label{display:block;font-size:13px;font-weight:600;color:var(--tx);margin-bottom:6px}
+.inp{width:100%;padding:10px 12px;border:1px solid var(--bd3);border-radius:8px;font-size:14px;outline:none;transition:border .2s;font-family:inherit;background:var(--bg2);color:var(--tx)}
+.inp:focus{border-color:var(--acc)}
+.help{font-size:12px;color:var(--tx3);margin-top:4px}
+.help a{color:var(--acc);font-weight:600}
+.btn{background:var(--acc);color:var(--bg);border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-sec{background:var(--bg2);color:var(--tx);border:1px solid var(--bd3);border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-sec:hover{background:var(--bg3)}
 .btn-sm{padding:6px 14px;font-size:12px;border-radius:6px}
-.btn-green{background:#0a7d4f;color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
-.btn-green:hover{background:#096b43}
-.btn-green:disabled{background:#93c9ae;cursor:not-allowed}
+.btn-green{background:var(--grn);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-green:hover{background:var(--grn3)}
+.btn-green:disabled{background:var(--grnd);cursor:not-allowed}
+.btn-skip{background:var(--bg2);color:var(--tx2);border:1px solid var(--bd3);border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-skip:hover{border-color:var(--tx3);color:var(--tx)}
 .btn-row{margin-top:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.progress-text{font-size:12px;color:#666}
-.pbar{background:#f0f0f0;border-radius:4px;height:6px;overflow:hidden;margin-top:6px;width:100%}
+.progress-text{font-size:12px;color:var(--tx2)}
+.pbar{background:var(--bg3);border-radius:4px;height:6px;overflow:hidden;margin-top:6px;width:100%}
 .pfill{height:100%;border-radius:4px;transition:width .3s ease}
-.pfill-dark{background:#111}
-.pfill-green{background:#0a7d4f}
-.error{background:#fff5f5;border:1px solid #fdd;border-radius:8px;padding:16px;color:#c00;font-size:13px;margin-bottom:16px}
+.pfill-dark{background:var(--acc)}
+.pfill-green{background:var(--grn)}
+.error{background:var(--errbg);border:1px solid var(--errbd);border-radius:8px;padding:16px;color:var(--err);font-size:13px;margin-bottom:16px}
 .stats{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.stat{background:#fff;border:1px solid #eee;border-radius:8px;padding:12px 18px;flex:1;min-width:80px}
-.stat-n{font-size:22px;font-weight:800;color:#111}
-.stat-n.green{color:#0a7d4f}
-.stat-l{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px}
+.stat{background:var(--bg2);border:1px solid var(--bd2);border-radius:8px;padding:12px 18px;flex:1;min-width:80px;transition:background .2s}
+.stat-n{font-size:22px;font-weight:800;color:var(--tx)}
+.stat-n.green{color:var(--grn)}
+.stat-l{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px}
 .toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.search{padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;flex:1;min-width:140px;outline:none;font-family:inherit}
-.search:focus{border-color:#111}
-.fbtn{padding:5px 12px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid #ddd;cursor:pointer;background:#fff;color:#333;font-family:inherit;transition:all .15s}
-.fbtn:hover{border-color:#999}
-.fbtn.on{background:#111;color:#fff;border-color:#111}
-.vtog{display:flex;border:1px solid #ddd;border-radius:6px;overflow:hidden;margin-left:auto;flex-shrink:0}
-.vb{padding:6px 10px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.vb+.vb{border-left:1px solid #ddd}
-.vb.on{background:#111}
-.vb.on svg *{stroke:#fff}
-.vb svg{width:16px;height:16px;stroke:#666;stroke-width:2;fill:none}
+.search{padding:8px 12px;border:1px solid var(--bd3);border-radius:8px;font-size:13px;flex:1;min-width:140px;outline:none;font-family:inherit;background:var(--bg2);color:var(--tx)}
+.search:focus{border-color:var(--acc)}
+.fbtn{padding:5px 12px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--bd3);cursor:pointer;background:var(--bg2);color:var(--tx2);font-family:inherit;transition:all .15s}
+.fbtn:hover{border-color:var(--tx3)}
+.fbtn.on{background:var(--acc);color:var(--bg);border-color:var(--acc)}
+.vtog{display:flex;border:1px solid var(--bd3);border-radius:6px;overflow:hidden;margin-left:auto;flex-shrink:0}
+.vb{padding:6px 10px;border:none;background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.vb+.vb{border-left:1px solid var(--bd3)}
+.vb.on{background:var(--acc)}
+.vb.on svg *{stroke:var(--bg)}
+.vb svg{width:16px;height:16px;stroke:var(--tx2);stroke-width:2;fill:none}
 .store-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .store-hdr-btns{display:flex;gap:6px}
-.store-hdr-btns button{font-size:11px;color:#666;background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:2px}
-.store-hdr-btns button:hover{color:#111}
+.store-hdr-btns button{font-size:11px;color:var(--tx2);background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:2px}
+.store-hdr-btns button:hover{color:var(--tx)}
 .store-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:12px}
-.store-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #e5e5e5;border-radius:8px;cursor:pointer;transition:all .15s;background:#fff;font-size:12px}
-.store-opt:hover{border-color:#aaa}
-.store-opt.on{border-color:#111;background:#f8f8f8}
+.store-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--bd);border-radius:8px;cursor:pointer;transition:all .15s;background:var(--bg2);font-size:12px}
+.store-opt:hover{border-color:var(--tx3)}
+.store-opt.on{border-color:var(--acc);background:var(--bg3)}
 .store-opt .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.store-opt .sn{font-weight:600;color:#111;flex:1}
-.store-opt .st{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.3px}
+.store-opt .sn{font-weight:600;color:var(--tx);flex:1}
+.store-opt .st{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.3px}
 .store-opt input{display:none}
-/* Check progress area — fixed layout */
-.check-area{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .check-progress{flex:1;min-width:250px;max-width:500px}
-.dig-msg{font-size:12px;color:#888;font-style:italic;margin-top:4px;height:16px;overflow:hidden}
-.v-list .it{background:#fff;border:1px solid #e8e8e8;border-radius:8px;display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:8px;transition:box-shadow .2s}
+.dig-msg{font-size:12px;color:var(--tx3);font-style:italic;margin-top:4px;height:16px;overflow:hidden}
+.store-stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.store-stat{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--bd2);border-radius:8px;background:var(--bg2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.store-stat:hover{border-color:var(--tx3)}
+.store-stat .dot{width:8px;height:8px;border-radius:50%}
+.store-stat .cnt{color:var(--grn)}
+.store-stat.on{border-color:var(--acc);background:var(--bg3)}
+/* Items */
+.v-list .it{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:8px;transition:box-shadow .2s,background .2s}
 .v-list .it:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
-.v-list .it-iw{width:52px;height:52px;flex-shrink:0;border-radius:6px;overflow:hidden;background:#f5f5f5;position:relative}
+.v-list .it-iw{width:52px;height:52px;flex-shrink:0;border-radius:6px;overflow:hidden;background:var(--bg3);position:relative}
 .v-list .it-iw img{width:100%;height:100%;object-fit:cover}
 .v-list .it-iw .ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
 .v-list .it-bd{flex:1;min-width:0}
-.v-list .it-ar{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.v-list .it-ti{font-size:13px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.v-list .it-me{font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-list .it-ar{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-list .it-ti{font-size:13px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-list .it-me{font-size:11px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .v-list .it-act{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .v-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
-.v-grid .it{background:#fff;border:1px solid #e8e8e8;border-radius:10px;overflow:hidden;transition:box-shadow .2s,transform .15s;display:flex;flex-direction:column}
+.v-grid .it{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;transition:box-shadow .2s,transform .15s;display:flex;flex-direction:column}
 .v-grid .it:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-2px)}
-.v-grid .it-iw{width:100%;padding-top:100%;position:relative;overflow:hidden;background:#f5f5f5;flex-shrink:0}
+.v-grid .it-iw{width:100%;padding-top:100%;position:relative;overflow:hidden;background:var(--bg3);flex-shrink:0}
 .v-grid .it-iw img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
 .v-grid .it-iw .ph{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
 .v-grid .it-bd{padding:10px 12px;flex:1;display:flex;flex-direction:column}
-.v-grid .it-ar{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.v-grid .it-ti{font-size:13px;font-weight:700;color:#111;margin-top:1px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.v-grid .it-me{font-size:10px;color:#888;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-grid .it-ar{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-grid .it-ti{font-size:13px;font-weight:700;color:var(--tx);margin-top:1px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.v-grid .it-me{font-size:10px;color:var(--tx3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
 .badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;white-space:nowrap}
 .badge a{text-decoration:underline;text-underline-offset:2px}
-.it-lnk{display:inline-flex;align-items:center;font-size:11px;font-weight:600;color:#888;text-decoration:none;padding:3px 8px;border:1px solid #eee;border-radius:5px;transition:all .15s;background:#fff;white-space:nowrap}
-.it-lnk:hover{background:#f5f5f5;color:#333}
-.empty{text-align:center;padding:40px;color:#888}
-.howto{text-align:center;color:#666;font-size:13px;line-height:1.7}
-.howto strong{color:#333}
-.note{font-size:12px;color:#999;margin-top:12px}
+.badge.oos{opacity:.6}
+.badge.oos a{text-decoration:line-through}
+.it-lnk{display:inline-flex;align-items:center;font-size:11px;font-weight:600;color:var(--tx3);text-decoration:none;padding:3px 8px;border:1px solid var(--bd2);border-radius:5px;transition:all .15s;background:var(--bg2);white-space:nowrap}
+.it-lnk:hover{background:var(--bg3);color:var(--tx)}
+.empty{text-align:center;padding:40px;color:var(--tx3)}
+.howto{text-align:center;color:var(--tx2);font-size:13px;line-height:1.7}
+.howto strong{color:var(--tx)}
+.note{font-size:12px;color:var(--tx3);margin-top:12px}
 .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .more{text-align:center;padding:20px}
 .vinyl{opacity:.15}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .spinner{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;animation:spin 2s linear infinite}
 .spinner svg{display:block}
-.store-stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.store-stat{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid #eee;border-radius:8px;background:#fff;font-size:12px;font-weight:600}
-.store-stat .dot{width:8px;height:8px;border-radius:50%}
-.store-stat .cnt{color:#0a7d4f}
-.store-stat.on{border-color:#111;background:#f5f5f5}
-.phase-label{font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.phase-label{font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
 @media(max-width:600px){
   .v-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
   .v-list .it{flex-wrap:wrap}
@@ -122,10 +130,11 @@ label{display:block;font-size:13px;font-weight:600;color:#333;margin-bottom:6px}
 </head>
 <body>
 <div class="app">
+  <button class="dm-toggle" id="dmtog" title="Toggle dark mode">&#9790;</button>
   <div class="header">
     <div class="logo">Porto <span>&times;</span> Wantlist</div>
     <div class="sub">Check your Discogs wantlist across Porto's record stores</div>
-    <div class="ver">v2.3 &mdash; 2026-03-15 store filters + stricter Shopify</div>
+    <div class="ver">v3.0 &mdash; 2026-03-15</div>
   </div>
   <div id="root"></div>
 </div>
@@ -138,6 +147,12 @@ var WORKER="https://porto-store-proxy.jsantosdealmeida.workers.dev/";
 var PER_PAGE=60;
 var CONCURRENT=4;
 
+/* Dark mode */
+if(localStorage.getItem("dm")==="1")document.body.classList.add("dark");
+document.getElementById("dmtog").addEventListener("click",function(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dm",document.body.classList.contains("dark")?"1":"0")});
+
 /* ========== TEXT HELPERS ========== */
 function slug(t){return(t||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"")}
 function norm(s){return(s||"").toLowerCase()
@@ -146,121 +161,105 @@ function norm(s){return(s||"").toLowerCase()
   .replace(/[\u00f9-\u00fc]/g,"u").replace(/[\u00f1]/g,"n").replace(/[\u00e7]/g,"c")
   .replace(/[^a-z0-9]/g," ").replace(/\s+/g," ").trim()}
 function qry(it){
-  /* Use only the FIRST artist (before any comma) + title.
-     Strip special chars that break search engines. */
   var a=it.artist.replace(/\s*\(\d+\)\s*$/,"").split(",")[0].trim();
   var t=it.title.replace(/[+&]/g," ").replace(/,(\d)/g,"$1").trim();
   return a+" "+t}
-function qryTitle(it){
-  /* Title-only query — useful for Shopify suggest which does fuzzy matching */
-  return it.title.replace(/[+&]/g," ").replace(/,(\d)/g,"$1").trim()}
+function qryTitle(it){return it.title.replace(/[+&]/g," ").replace(/,(\d)/g,"$1").trim()}
 function textMatch(body,artist,title){
   var b=norm(body),a=norm(artist),t=norm(title);
   if(a.length<2||t.length<2)return false;
   return b.indexOf(a)!==-1&&b.indexOf(t)!==-1}
 
+/* Shopify product match — strict: title must appear in product title, artist in title or vendor */
+function shopifyMatch(prod,it){
+  var pt=norm(prod.title||"");
+  var pv=norm(prod.vendor||"");
+  var ti=norm(it.title);
+  var ai=norm(it.artist.split(",")[0]);
+  if(ti.length<3)return null;
+  /* Title must appear in product title */
+  if(pt.indexOf(ti)===-1)return null;
+  /* For short titles (<6 chars), require exact product title match or artist present */
+  if(ti.length<6){
+    if(pt===ti||(ai.length>2&&(pt.indexOf(ai)!==-1||pv.indexOf(ai)!==-1)))
+      return{found:true,oos:prod.available===false};
+    return null}
+  /* Longer titles: if title matches, check artist too for safety */
+  if(ai.length>2&&pt.indexOf(ai)===-1&&pv.indexOf(ai)===-1)return null;
+  return{found:true,oos:prod.available===false}}
+
 /* ========== STORE REGISTRY ========== */
 var STORES=[
-  /* --- WEB: DIRECT URL CHECK --- */
   {id:"8mm",name:"8mm Records",short:"8mm",type:"web",color:"#111",
    url:"https://www.8mm-records.com",defOn:true,
    getCheckUrl:function(it){return"https://www.8mm-records.com/release/"+it.id+"/"+slug(it.artist+"-"+it.title)},
    detect:function(j,it){
      if(j.title&&j.title.length>20){var l=j.title.toLowerCase();
-       if(l.indexOf("8mm records")!==0&&l.indexOf("8mm-records")!==0&&l!=="8mm")return"found"}
-     if(j.hasBasket||j.hasPrice)return"found";return"no"},
+       if(l.indexOf("8mm records")!==0&&l.indexOf("8mm-records")!==0&&l!=="8mm")return{s:"found",oos:!!j.hasOutOfStock}}
+     if(j.hasBasket||j.hasPrice)return{s:"found",oos:!!j.hasOutOfStock};return{s:"no"}},
    getStoreUrl:function(it){return"https://www.8mm-records.com/release/"+it.id+"/"+slug(it.artist+"-"+it.title)}},
 
-  /* --- WEB: SEARCH (HTML) --- */
   {id:"materia",name:"Matéria Prima",short:"Matéria",type:"web-search",color:"#0F6E56",
    url:"https://www.materiaprima.pt",defOn:true,
-   getCheckUrl:function(it){
-     /* Search by title only — Matéria Prima's search works best with shorter queries */
-     return"https://www.materiaprima.pt/lista.php?search="+encodeURIComponent(qryTitle(it))},
+   getCheckUrl:function(it){return"https://www.materiaprima.pt/lista.php?search="+encodeURIComponent(qryTitle(it))},
    detect:function(j,it){
-     if(!j.bodyText)return"err";
+     if(!j.bodyText)return{s:"err"};
      var b=norm(j.bodyText),ti=norm(it.title),ai=norm(it.artist.split(",")[0]);
-     if(ti.length<3)return"no";
-     /* Check if title appears in body — then verify artist is also somewhere on page */
-     if(b.indexOf(ti)!==-1&&(ai.length<3||b.indexOf(ai)!==-1))return"found";
-     return"no"},
+     if(ti.length<3)return{s:"no"};
+     if(b.indexOf(ti)!==-1&&(ai.length<3||b.indexOf(ai)!==-1)){
+       var oos=j.hasOutOfStock&&norm(j.bodyText).indexOf("out of stock")!==-1;
+       return{s:"found",oos:oos}}
+     return{s:"no"}},
    getStoreUrl:function(it){return"https://www.materiaprima.pt/lista.php?search="+encodeURIComponent(qryTitle(it))}},
 
   {id:"portocalling",name:"Porto Calling",short:"PtCalling",type:"web-search",color:"#639922",
    url:"https://portocalling.com",defOn:true,
    getCheckUrl:function(it){return"https://portocalling.com/en/?s="+encodeURIComponent(qry(it))+"&post_type=product"},
    detect:function(j,it){
-     if(!j.bodyText)return"err";
+     if(!j.bodyText)return{s:"err"};
      var b=norm(j.bodyText);
-     /* WooCommerce shows "no products were found" when search has no results */
-     if(b.indexOf("no products")!==-1||b.indexOf("nenhum produto")!==-1||b.indexOf("no results")!==-1)return"no";
-     /* Require title in page title or og:title (not just body — body has too much noise) */
+     if(b.indexOf("no products")!==-1||b.indexOf("nenhum produto")!==-1||b.indexOf("no results")!==-1)return{s:"no"};
      var pt=norm(j.title||"")+"|"+norm(j.ogTitle||"");
      var ti=norm(it.title);
-     if(ti.length>3&&pt.indexOf(ti)!==-1)return"found";
-     /* Fallback: check if result count is shown and > 0, and title appears near artist */
+     if(ti.length>3&&pt.indexOf(ti)!==-1)return{s:"found"};
      var rMatch=j.bodyText.match(/(\d+)\s*result/i);
-     if(rMatch&&parseInt(rMatch[1])===0)return"no";
-     if(rMatch&&parseInt(rMatch[1])>0&&textMatch(j.bodyText,it.artist,it.title))return"found";
-     return"no"},
+     if(rMatch&&parseInt(rMatch[1])===0)return{s:"no"};
+     if(rMatch&&parseInt(rMatch[1])>0&&textMatch(j.bodyText,it.artist,it.title))return{s:"found"};
+     return{s:"no"}},
    getStoreUrl:function(it){return"https://portocalling.com/en/?s="+encodeURIComponent(qry(it))+"&post_type=product"}},
 
   {id:"socorro",name:"Socorro",short:"Socorro",type:"web-search",color:"#A32D2D",
    url:"https://socorro.pt",defOn:true,
-   getCheckUrl:function(it){
-     /* Socorro uses /en/vinyl/{artist-slug}-{title-slug} URLs.
-        Try direct product page like 8mm approach. */
-     var s=slug(it.artist.split(",")[0]+"-"+it.title);
-     return"https://socorro.pt/en/vinyl/"+s},
+   getCheckUrl:function(it){var s=slug(it.artist.split(",")[0]+"-"+it.title);return"https://socorro.pt/en/vinyl/"+s},
    detect:function(j,it){
-     if(!j.bodyText)return"err";
-     if(j.status===404||j.status===301)return"no";
-     /* If the page title contains the album title, it's a real product page */
-     var pt=norm(j.title||"");
-     var ti=norm(it.title);
-     if(ti.length>3&&pt.indexOf(ti)!==-1)return"found";
-     /* Fallback: check body for artist+title near a price */
-     if(textMatch(j.bodyText,it.artist.split(",")[0],it.title)&&j.hasPrice)return"found";
-     return"no"},
-   getStoreUrl:function(it){
-     var s=slug(it.artist.split(",")[0]+"-"+it.title);
-     return"https://socorro.pt/en/vinyl/"+s}},
+     if(!j.bodyText)return{s:"err"};
+     if(j.status===404||j.status===301)return{s:"no"};
+     var pt=norm(j.title||""),ti=norm(it.title);
+     if(ti.length>3&&pt.indexOf(ti)!==-1)return{s:"found",oos:!!j.hasOutOfStock};
+     if(textMatch(j.bodyText,it.artist.split(",")[0],it.title)&&j.hasPrice)return{s:"found",oos:!!j.hasOutOfStock};
+     return{s:"no"}},
+   getStoreUrl:function(it){var s=slug(it.artist.split(",")[0]+"-"+it.title);return"https://socorro.pt/en/vinyl/"+s}},
 
-  /* --- WEB: SEARCH (Shopify JSON) --- */
   {id:"musicriots",name:"Music and Riots",short:"M&R",type:"web-search",color:"#854F0B",
    url:"https://shopmusicandriots.com",defOn:true,
-   getCheckUrl:function(it){return"https://shopmusicandriots.com/search/suggest.json?q="+encodeURIComponent(qryTitle(it))+"&resources[type]=product&limit=10"},
+   getCheckUrl:function(it){return"https://shopmusicandriots.com/search/suggest.json?q="+encodeURIComponent(qry(it))+"&resources[type]=product&limit=10"},
    detect:function(j,it){
-     if(j.json){
-       var prods=(j.json.resources&&j.json.resources.results&&j.json.resources.results.products)||[];
-       var ti=norm(it.title),ai=norm(it.artist.split(",")[0]);
-       for(var i=0;i<prods.length;i++){
-         var pt=norm(prods[i].title||"");
-         if(ti.length>3&&pt.indexOf(ti)!==-1)return"found";
-         if(ai.length>3&&pt.indexOf(ai)!==-1&&ti.length>3&&pt.indexOf(ti)!==-1)return"found"}
-       return"no"}
-     return"no"},
+     if(!j.json)return{s:"no"};
+     var prods=(j.json.resources&&j.json.resources.results&&j.json.resources.results.products)||[];
+     for(var i=0;i<prods.length;i++){var m=shopifyMatch(prods[i],it);if(m&&m.found)return{s:"found",oos:m.oos}}
+     return{s:"no"}},
    getStoreUrl:function(it){return"https://shopmusicandriots.com/search?q="+encodeURIComponent(qry(it))+"&type=product"}},
 
   {id:"discosdobau",name:"Discos do Baú",short:"Baú",type:"web-search",color:"#712B13",
    url:"https://discosdobau.pt",defOn:true,
-   getCheckUrl:function(it){return"https://discosdobau.pt/search/suggest.json?q="+encodeURIComponent(qryTitle(it))+"&resources[type]=product&limit=10"},
+   getCheckUrl:function(it){return"https://discosdobau.pt/search/suggest.json?q="+encodeURIComponent(qry(it))+"&resources[type]=product&limit=10"},
    detect:function(j,it){
-     if(j.json){
-       var prods=(j.json.resources&&j.json.resources.results&&j.json.resources.results.products)||[];
-       var ti=norm(it.title),ai=norm(it.artist.split(",")[0]);
-       for(var i=0;i<prods.length;i++){
-         var pt=norm(prods[i].title||"");
-         var pv=norm(prods[i].vendor||"");
-         var pAll=pt+" "+pv;
-         /* Match if title appears in product title, or if artist appears in vendor/title */
-         if(ti.length>3&&pAll.indexOf(ti)!==-1)return"found";
-         if(ai.length>3&&pAll.indexOf(ai)!==-1&&ti.length>3&&pAll.indexOf(ti)!==-1)return"found"}
-       return"no"}
-     return"no"},
+     if(!j.json)return{s:"no"};
+     var prods=(j.json.resources&&j.json.resources.results&&j.json.resources.results.products)||[];
+     for(var i=0;i<prods.length;i++){var m=shopifyMatch(prods[i],it);if(m&&m.found)return{s:"found",oos:m.oos}}
+     return{s:"no"}},
    getStoreUrl:function(it){return"https://discosdobau.pt/search?q="+encodeURIComponent(qry(it))+"&type=product"}},
 
-  /* --- DISCOGS SELLERS (slow — off by default) --- */
   {id:"bunker",name:"Bunker Store",short:"Bunker",type:"discogs",
    seller:"PerAngustaAdAugusta",color:"#534AB7",defOn:false,
    url:"https://www.discogs.com/seller/PerAngustaAdAugusta/profile"},
@@ -271,22 +270,19 @@ var STORES=[
    seller:"PIRANHACD",color:"#993556",defOn:false,
    url:"https://www.discogs.com/seller/PIRANHACD/profile"},
 
-  /* --- COMING SOON --- */
-  {id:"louie",name:"Louie Louie",short:"Louie",type:"web-tbd",color:"#185FA5",
-   url:"https://www.louielouie.pt"},
-  {id:"tubitek",name:"Tubitek",short:"Tubitek",type:"web-tbd",color:"#3C3489",
-   url:"https://cdgo.com"}
+  {id:"louie",name:"Louie Louie",short:"Louie",type:"web-tbd",color:"#185FA5",url:"https://www.louielouie.pt"},
+  {id:"tubitek",name:"Tubitek",short:"Tubitek",type:"web-tbd",color:"#3C3489",url:"https://cdgo.com"}
 ];
 
 var CHECKABLE=STORES.filter(function(s){return s.type!=="web-tbd"});
 
 /* ========== STATE ========== */
 var root=document.getElementById("root");
-var S={
-  items:[],loaded:false,loading:false,error:null,progress:null,
+var S={items:[],loaded:false,loading:false,error:null,progress:null,
   search:"",format:"all",vis:PER_PAGE,view:"list",
-  selectedStores:{},checking:false,cabort:false,
+  selectedStores:{},checking:false,cabort:false,cskip:false,
   checkPhase:"",checkStore:"",checkProg:null,
+  /* results: { storeId: { releaseId: {s:"found"|"no"|"err", oos:bool} } } */
   results:{},invCache:{},onlyFound:false,filterStore:null,
   user:"",token:""};
 CHECKABLE.forEach(function(s){S.selectedStores[s.id]=!!s.defOn});
@@ -297,186 +293,124 @@ function saveCreds(){try{sessionStorage.setItem("dg_u",S.user);sessionStorage.se
 function h(s){var d=document.createElement("div");d.textContent=s||"";return d.innerHTML}
 function wait(ms){return new Promise(function(r){setTimeout(r,ms)})}
 function $(id){return document.getElementById(id)}
-function svg(sz){sz=sz||36;return'<svg class="vinyl" width="'+sz+'" height="'+sz+'" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#aaa" stroke-width="1.5" fill="none"/><circle cx="24" cy="24" r="8" stroke="#aaa" stroke-width="1.5" fill="none"/><circle cx="24" cy="24" r="2" fill="#bbb"/></svg>'}
-function spinSvg(){return'<span class="spinner"><svg width="20" height="20" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="#0a7d4f" stroke-width="2" fill="none" opacity=".3"/><circle cx="24" cy="24" r="22" stroke="#0a7d4f" stroke-width="2" fill="none" stroke-dasharray="40 100" stroke-linecap="round"/></svg></span>'}
+function svg(sz){sz=sz||36;return'<svg class="vinyl" width="'+sz+'" height="'+sz+'" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="'+(document.body.classList.contains("dark")?"#555":"#aaa")+'" stroke-width="1.5" fill="none"/><circle cx="24" cy="24" r="8" stroke="'+(document.body.classList.contains("dark")?"#555":"#aaa")+'" stroke-width="1.5" fill="none"/><circle cx="24" cy="24" r="2" fill="'+(document.body.classList.contains("dark")?"#666":"#bbb")+'"/></svg>'}
+function spinSvg(){return'<span class="spinner"><svg width="20" height="20" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" stroke="var(--grn)" stroke-width="2" fill="none" opacity=".3"/><circle cx="24" cy="24" r="22" stroke="var(--grn)" stroke-width="2" fill="none" stroke-dasharray="40 100" stroke-linecap="round"/></svg></span>'}
 
-var DIG_MSGS=[
-  "Flipping through dusty Kallax furniture\u2026",
-  "Trying not to fall from the ladder\u2026",
-  "Blowing dust off a rare pressing\u2026",
-  "Squinting at handwritten price stickers\u2026",
-  "Careful, that sleeve is fragile\u2026",
-  "Pretending to know what \u2018first pressing\u2019 means\u2026",
-  "Lost in the world music section\u2026",
-  "Is that a test pressing?! Oh wait, no\u2026",
-  "Holding a record up to check for warps\u2026",
-  "The bin dividers are lying to me\u2026",
-  "Someone just put on a killer B-side\u2026",
-  "Asking the clerk for recommendations\u2026",
-  "Debating if VG+ is good enough\u2026",
-  "Running fingers across the spines\u2026",
-  "That new vinyl smell though\u2026",
-  "Trying to read Japanese liner notes\u2026",
-  "The bass on this pressing is insane\u2026",
-  "Contemplating a double album purchase\u2026"];
-/* Shuffle on load */
+var DIG_MSGS=["Flipping through dusty Kallax furniture\u2026","Trying not to fall from the ladder\u2026","Blowing dust off a rare pressing\u2026","Squinting at handwritten price stickers\u2026","Careful, that sleeve is fragile\u2026","Pretending to know what \u2018first pressing\u2019 means\u2026","Lost in the world music section\u2026","Is that a test pressing?! Oh wait, no\u2026","Holding a record up to check for warps\u2026","The bin dividers are lying to me\u2026","Someone just put on a killer B-side\u2026","Asking the clerk for recommendations\u2026","Debating if VG+ is good enough\u2026","Running fingers across the spines\u2026","That new vinyl smell though\u2026","Trying to read Japanese liner notes\u2026","Contemplating a double album purchase\u2026"];
 for(var _i=DIG_MSGS.length-1;_i>0;_i--){var _j=Math.floor(Math.random()*(_i+1));var _t=DIG_MSGS[_i];DIG_MSGS[_i]=DIG_MSGS[_j];DIG_MSGS[_j]=_t}
-var digIdx=0;
-function nextDig(){digIdx=(digIdx+1)%DIG_MSGS.length;return DIG_MSGS[digIdx]}
+var digIdx=0;function nextDig(){digIdx=(digIdx+1)%DIG_MSGS.length;return DIG_MSGS[digIdx]}
 
-/* ========== DISCOGS WANTLIST FETCH ========== */
+/* ========== DISCOGS WANTLIST ========== */
 async function fetchWL(){
   S.loading=true;S.error=null;S.items=[];S.loaded=false;S.progress=null;S.vis=PER_PAGE;
-  S.search="";S.format="all";S.results={};S.checking=false;S.onlyFound=false;S.invCache={};
+  S.search="";S.format="all";S.results={};S.checking=false;S.onlyFound=false;S.filterStore=null;S.invCache={};
   render();
   var pg=1,all=[],tp=1,tot=0;
   try{
     while(pg<=tp){
-      var hd={"User-Agent":"PortoWantlistTracker/2.1"};
+      var hd={"User-Agent":"PortoWantlistTracker/3.0"};
       if(S.token)hd["Authorization"]="Discogs token="+S.token;
       var url=API+"/users/"+encodeURIComponent(S.user)+"/wants?per_page=100&page="+pg+"&sort=added&sort_order=desc";
       var r=await fetch(url,{headers:hd});
-      if(!r.ok){
-        if(r.status===401)throw new Error("Authentication failed \u2014 check your token.");
-        if(r.status===404)throw new Error("User not found \u2014 check your username.");
-        if(r.status===429){await wait(2500);continue}
-        throw new Error("Discogs error ("+r.status+")")}
-      var d=await r.json();
-      tp=d.pagination&&d.pagination.pages||1;
-      tot=d.pagination&&d.pagination.items||0;
-      all=all.concat(d.wants||[]);
-      S.progress={ld:all.length,tot:tot,pg:pg,tp:tp};render();
+      if(!r.ok){if(r.status===401)throw new Error("Authentication failed.");if(r.status===404)throw new Error("User not found.");if(r.status===429){await wait(2500);continue}throw new Error("Discogs error ("+r.status+")")}
+      var d=await r.json();tp=d.pagination&&d.pagination.pages||1;tot=d.pagination&&d.pagination.items||0;
+      all=all.concat(d.wants||[]);S.progress={ld:all.length,tot:tot,pg:pg,tp:tp};render();
       pg++;if(pg<=tp)await wait(1100)}
-    S.items=all.map(function(w){
-      var b=w.basic_information||{};
-      return{id:String(b.id||w.id||""),
-        artist:(b.artists||[]).map(function(a){return a.name.replace(/ \(\d+\)$/,"")}).join(", ")||"Unknown",
-        title:b.title||"",label:(b.labels||[])[0]?b.labels[0].name:"",
-        catno:(b.labels||[])[0]?b.labels[0].catno:"",
-        format:(b.formats||[]).map(function(f){return f.name}).join(", "),
-        year:b.year||"",thumb:b.cover_image||b.thumb||""}});
+    S.items=all.map(function(w){var b=w.basic_information||{};return{id:String(b.id||w.id||""),
+      artist:(b.artists||[]).map(function(a){return a.name.replace(/ \(\d+\)$/,"")}).join(", ")||"Unknown",
+      title:b.title||"",label:(b.labels||[])[0]?b.labels[0].name:"",catno:(b.labels||[])[0]?b.labels[0].catno:"",
+      format:(b.formats||[]).map(function(f){return f.name}).join(", "),year:b.year||"",thumb:b.cover_image||b.thumb||""}});
     S.loaded=true
-  }catch(e){S.error=e.message}
-  S.loading=false;S.progress=null;render()
-}
+  }catch(e){S.error=e.message}S.loading=false;S.progress=null;render()}
 
-/* ========== STRATEGY A: DISCOGS SELLER INVENTORY ========== */
+/* ========== DISCOGS SELLER ========== */
 async function fetchSellerInventory(seller){
   if(S.invCache[seller])return S.invCache[seller];
   var ids=new Set(),pg=1,tp=1,tot=0;
-  while(pg<=tp){
-    var hd={"User-Agent":"PortoWantlistTracker/2.1"};
+  while(pg<=tp&&!S.cskip){
     var url=API+"/users/"+encodeURIComponent(seller)+"/inventory?per_page=100&page="+pg+"&sort=listed&sort_order=desc";
     if(S.token)url+="&token="+encodeURIComponent(S.token);
-    var r=await fetch(url,{headers:hd});
-    if(!r.ok){
-      if(r.status===429){await wait(2000);continue}
-      console.log("[inventory] "+seller+" error "+r.status);break}
-    var d=await r.json();
-    tp=d.pagination?d.pagination.pages:1;
-    tot=d.pagination?d.pagination.items:0;
+    var r=await fetch(url,{headers:{"User-Agent":"PortoWantlistTracker/3.0"}});
+    if(!r.ok){if(r.status===429){await wait(2000);continue}break}
+    var d=await r.json();tp=d.pagination?d.pagination.pages:1;tot=d.pagination?d.pagination.items:0;
     (d.listings||[]).forEach(function(l){if(l.release&&l.release.id)ids.add(String(l.release.id))});
-    S.checkProg={done:ids.size,tot:tot};
-    var pt=$("chkprog");if(pt)pt.textContent="Page "+pg+"/"+tp+" \u2014 "+ids.size+"/"+tot+" items loaded";
+    var pt=$("chkprog");if(pt)pt.textContent="Page "+pg+"/"+tp+" \u2014 "+ids.size+"/"+tot+" loaded";
     var pf=$("chkfill");if(pf)pf.style.width=(pg/Math.max(tp,1)*100)+"%";
-    pg++;if(pg<=tp)await wait(1050)}
+    pg++;if(pg<=tp&&!S.cskip)await wait(1050)}
   S.invCache[seller]=ids;return ids}
 
 async function checkDiscogsStore(store){
-  S.checkPhase="discogs";S.checkStore=store.name;S.checkProg=null;updateCheckUI();
-  try{
-    var ids=await fetchSellerInventory(store.seller);
-    if(!S.results[store.id])S.results[store.id]={};
-    var fc=0;
-    S.items.forEach(function(it){
-      if(ids.has(it.id)){S.results[store.id][it.id]="found";fc++}
-      else{S.results[store.id][it.id]="no"}});
-    console.log("[discogs] "+store.name+": "+fc+" found (inventory: "+ids.size+")")
-  }catch(e){console.log("[discogs] "+store.name+" error: "+e.message)}}
+  S.checkPhase="discogs";S.checkStore=store.name;S.checkProg=null;S.cskip=false;updateCheckUI();
+  var ids=await fetchSellerInventory(store.seller);
+  if(!S.results[store.id])S.results[store.id]={};
+  var fc=0;S.items.forEach(function(it){
+    if(ids.has(it.id)){S.results[store.id][it.id]={s:"found"};fc++}
+    else S.results[store.id][it.id]={s:"no"}});
+  console.log("[discogs] "+store.name+": "+fc+" found (inv: "+ids.size+")")}
 
-/* ========== STRATEGY B: WEB CHECK ========== */
+/* ========== WEB CHECK ========== */
 async function checkWebItem(store,it){
-  var url=store.getCheckUrl(it);
-  var endpoint=WORKER+"?url="+encodeURIComponent(url);
+  var endpoint=WORKER+"?url="+encodeURIComponent(store.getCheckUrl(it));
   try{
-    var r=await fetch(endpoint);
-    if(!r.ok)return"err";
-    var j=await r.json();
-    if(j.error){console.log("[web] "+store.id+": "+j.error);return"err"}
+    var r=await fetch(endpoint);if(!r.ok)return{s:"err"};
+    var j=await r.json();if(j.error)return{s:"err"};
     return store.detect(j,it)
-  }catch(e){console.log("[web] "+store.id+" error: "+e.message);return"err"}}
+  }catch(e){return{s:"err"}}}
 
 async function checkWebStore(store){
-  S.checkPhase="web";S.checkStore=store.name;
+  S.checkPhase="web";S.checkStore=store.name;S.cskip=false;
   if(!S.results[store.id])S.results[store.id]={};
   var queue=S.items.slice(),done=0,tot=S.items.length;
   S.checkProg={done:0,tot:tot,found:0};updateCheckUI();
-
-  while(queue.length>0&&!S.cabort){
+  while(queue.length>0&&!S.cabort&&!S.cskip){
     var batch=queue.splice(0,CONCURRENT);
-    var results=await Promise.all(batch.map(function(it){
-      return checkWebItem(store,it).then(function(r){return{it:it,r:r}})}));
+    var results=await Promise.all(batch.map(function(it){return checkWebItem(store,it).then(function(r){return{it:it,r:r}})}));
     results.forEach(function(o){S.results[store.id][o.it.id]=o.r});
     done+=batch.length;
-    var fc=0;Object.values(S.results[store.id]).forEach(function(v){if(v==="found")fc++});
+    var fc=0;Object.values(S.results[store.id]).forEach(function(v){if(v.s==="found")fc++});
     S.checkProg={done:done,tot:tot,found:fc};
     var pt=$("chkprog");if(pt)pt.textContent=done+"/"+tot+" checked ("+fc+" found)";
     var pf=$("chkfill");if(pf)pf.style.width=(done/Math.max(tot,1)*100)+"%";
-    if(queue.length>0&&!S.cabort)await wait(250)}}
+    if(queue.length>0&&!S.cabort&&!S.cskip)await wait(250)}
+  if(S.cskip)console.log("[web] Skipped "+store.name)}
 
 /* ========== CHECK ALL ========== */
 async function checkAll(){
-  S.checking=true;S.cabort=false;S.results={};S.filterStore=null;S.onlyFound=false;render();
+  S.checking=true;S.cabort=false;S.cskip=false;S.results={};S.filterStore=null;S.onlyFound=false;render();
   var digTimer=setInterval(function(){var el=$("digmsg");if(el)el.textContent=nextDig()},3500);
   var selected=CHECKABLE.filter(function(s){return S.selectedStores[s.id]});
-  /* Web stores first (fast), then Discogs sellers (slow) */
   var webStores=selected.filter(function(s){return s.type==="web"||s.type==="web-search"});
   var discogsStores=selected.filter(function(s){return s.type==="discogs"});
-
-  for(var j=0;j<webStores.length&&!S.cabort;j++){
-    await checkWebStore(webStores[j]);render()}
-  for(var i=0;i<discogsStores.length&&!S.cabort;i++){
-    await checkDiscogsStore(discogsStores[i]);render()}
-
-  clearInterval(digTimer);
-  S.checking=false;S.checkPhase="";S.checkStore="";S.checkProg=null;render()}
+  for(var j=0;j<webStores.length&&!S.cabort;j++){await checkWebStore(webStores[j]);render()}
+  for(var i=0;i<discogsStores.length&&!S.cabort;i++){await checkDiscogsStore(discogsStores[i]);render()}
+  clearInterval(digTimer);S.checking=false;S.checkPhase="";S.checkStore="";S.checkProg=null;render()}
 
 function updateCheckUI(){
-  var el=$("chkphase");
-  if(el)el.textContent=(S.checkPhase==="discogs"?"Loading inventory: ":"Searching: ")+S.checkStore}
+  var el=$("chkphase");if(el)el.textContent=(S.checkPhase==="discogs"?"Loading inventory: ":"Searching: ")+S.checkStore}
 
 /* ========== RESULT HELPERS ========== */
 function getItemStores(it){
-  var found=[];STORES.forEach(function(s){
-    if(S.results[s.id]&&S.results[s.id][it.id]==="found")found.push(s)});return found}
+  var found=[];STORES.forEach(function(s){if(S.results[s.id]&&S.results[s.id][it.id]&&S.results[s.id][it.id].s==="found")found.push(s)});return found}
+function isOos(it,sid){var r=S.results[sid]&&S.results[sid][it.id];return r&&r.oos}
 function totalFound(){
   var ids={};STORES.forEach(function(s){if(!S.results[s.id])return;
-    Object.keys(S.results[s.id]).forEach(function(k){if(S.results[s.id][k]==="found")ids[k]=true})});
-  return Object.keys(ids).length}
-function storeFoundCount(sid){
-  if(!S.results[sid])return 0;var c=0;
-  Object.values(S.results[sid]).forEach(function(v){if(v==="found")c++});return c}
+    Object.keys(S.results[s.id]).forEach(function(k){if(S.results[s.id][k].s==="found")ids[k]=true})});return Object.keys(ids).length}
+function storeFoundCount(sid){if(!S.results[sid])return 0;var c=0;Object.values(S.results[sid]).forEach(function(v){if(v.s==="found")c++});return c}
 function hasAnyResults(){return Object.keys(S.results).length>0}
+function isFoundAt(it,sid){return S.results[sid]&&S.results[sid][it.id]&&S.results[sid][it.id].s==="found"}
 
 /* ========== FILTERS ========== */
-function fmts(){
-  var s={};S.items.forEach(function(it){it.format.split(",").forEach(function(f){f=f.trim();if(f)s[f]=true})});
-  return["all"].concat(Object.keys(s)).slice(0,7)}
+function fmts(){var s={};S.items.forEach(function(it){it.format.split(",").forEach(function(f){f=f.trim();if(f)s[f]=true})});return["all"].concat(Object.keys(s)).slice(0,7)}
 function filtered(){
   var q=S.search.toLowerCase(),f=S.format;
   return S.items.filter(function(it){
     var t=(it.artist+" "+it.title+" "+it.label+" "+it.catno).toLowerCase();
     return(!q||t.indexOf(q)!==-1)&&(f==="all"||it.format.toLowerCase().indexOf(f.toLowerCase())!==-1)&&(!S.onlyFound||getItemStores(it).length>0)&&(!S.filterStore||isFoundAt(it,S.filterStore))})}
 
-function isFoundAt(it,sid){return S.results[sid]&&S.results[sid][it.id]==="found"}
-
 /* ========== RENDER ========== */
 var IG='<svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>';
 var IL='<svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="3" rx="1"/><rect x="1" y="7" width="14" height="3" rx="1"/><rect x="1" y="12" width="14" height="3" rx="1"/></svg>';
-
-function imgTag(src,sz){
-  if(!src)return'<div class="ph">'+svg(sz||36)+'</div>';
-  return'<img src="'+h(src)+'" alt="" loading="lazy" onerror="this.parentNode.innerHTML=\''+svg(sz||36).replace(/'/g,"\\'")+'\'">'}
+function imgTag(src,sz){if(!src)return'<div class="ph">'+svg(sz||36)+'</div>';return'<img src="'+h(src)+'" alt="" loading="lazy" onerror="this.parentNode.innerHTML=\'<div class=ph>'+svg(sz||36).replace(/'/g,"\\'")+'</div>\'">'}
 
 function badgesHTML(it){
   var stores=getItemStores(it);if(stores.length===0)return"";
@@ -484,9 +418,12 @@ function badgesHTML(it){
   stores.forEach(function(s){
     var link;
     if(s.type==="discogs")link="https://www.discogs.com/sell/release/"+it.id+"?ev=rb&seller_id="+encodeURIComponent(s.seller);
-    else if(s.getStoreUrl)link=s.getStoreUrl(it);
-    else link=s.url;
-    o+='<span class="badge" style="background:'+s.color+'15;color:'+s.color+'"><a href="'+h(link)+'" target="_blank" style="color:'+s.color+'">'+h(s.short)+'</a></span>'});
+    else if(s.getStoreUrl)link=s.getStoreUrl(it);else link=s.url;
+    var oos=isOos(it,s.id);
+    o+='<span class="badge'+(oos?" oos":"")+'" style="background:'+s.color+'15;color:'+s.color+'">';
+    o+='<a href="'+h(link)+'" target="_blank" style="color:'+s.color+'">'+h(s.short)+'</a>';
+    if(oos)o+=' <span style="font-size:9px;opacity:.7">oos</span>';
+    o+='</span>'});
   return o+'</div>'}
 
 function renderItem(it){
@@ -496,8 +433,7 @@ function renderItem(it){
   if(S.view==="list"){
     return'<div class="it"><div class="it-iw">'+imgTag(it.thumb,24)+'</div>'+
       '<div class="it-bd"><div class="it-ar">'+h(it.artist)+'</div><div class="it-ti">'+h(it.title)+'</div>'+
-      '<div class="it-me">'+h(meta)+'</div>'+badges+'</div>'+
-      '<div class="it-act">'+discLink+'</div></div>'}
+      '<div class="it-me">'+h(meta)+'</div>'+badges+'</div><div class="it-act">'+discLink+'</div></div>'}
   return'<div class="it"><div class="it-iw">'+imgTag(it.thumb,36)+'</div>'+
     '<div class="it-bd"><div class="it-ar">'+h(it.artist)+'</div><div class="it-ti">'+h(it.title)+'</div>'+
     '<div class="it-me">'+h(meta)+'</div>'+badges+'<div style="margin-top:4px">'+discLink+'</div></div></div>'}
@@ -507,33 +443,21 @@ function render(){
     var er=S.error?'<div class="error">'+h(S.error)+'</div>':'';
     root.innerHTML=er+
       '<div class="card"><div class="form-row">'+
-      '<div><label for="iu">Discogs Username</label>'+
-      '<input class="inp" type="text" id="iu" placeholder="your_username" value="'+h(S.user)+'" autocomplete="off"></div>'+
-      '<div><label for="it">Personal Access Token</label>'+
-      '<input class="inp" type="text" id="it" placeholder="paste your token here" value="'+h(S.token)+'" autocomplete="off" style="-webkit-text-security:disc">'+
+      '<div><label for="iu">Discogs Username</label><input class="inp" type="text" id="iu" placeholder="your_username" value="'+h(S.user)+'" autocomplete="off"></div>'+
+      '<div><label for="it">Personal Access Token</label><input class="inp" type="text" id="it" placeholder="paste your token here" value="'+h(S.token)+'" autocomplete="off" style="-webkit-text-security:disc">'+
       '<div class="help">Get one at <a href="https://www.discogs.com/settings/developers" target="_blank">discogs.com/settings/developers</a></div></div>'+
       '</div><div class="btn-row"><button class="btn" id="bgo">Fetch My Wantlist</button></div></div>'+
-      '<div class="card howto"><strong>How it works</strong><br>'+
-      '1. Enter your Discogs username and token<br>'+
-      '2. We fetch your wantlist from the Discogs API<br>'+
-      '3. Select which Porto stores to check<br>'+
-      '4. Found items link directly to each store\'s listing'+
+      '<div class="card howto"><strong>How it works</strong><br>1. Enter your Discogs username and token<br>2. We fetch your wantlist from the Discogs API<br>3. Select which Porto stores to check<br>4. Found items link directly to each store\'s listing'+
       '<div class="note" style="margin-top:16px">\uD83D\uDD12 Everything runs in your browser. Your token is stored only in your session.</div></div>';
-    $("bgo").addEventListener("click",function(){
-      S.user=$("iu").value.trim();S.token=$("it").value.trim();saveCreds();
-      if(S.user)fetchWL()});
+    $("bgo").addEventListener("click",function(){S.user=$("iu").value.trim();S.token=$("it").value.trim();saveCreds();if(S.user)fetchWL()});
     $("iu").addEventListener("keydown",function(e){if(e.key==="Enter")$("bgo").click()});
-    $("it").addEventListener("keydown",function(e){if(e.key==="Enter")$("bgo").click()});
-    return}
+    $("it").addEventListener("keydown",function(e){if(e.key==="Enter")$("bgo").click()});return}
   if(S.loading){
     var p=S.progress;
-    var ph=p?'<div class="progress-text">Loaded '+p.ld+' of '+p.tot+' items (page '+p.pg+'/'+p.tp+')</div>'+
-      '<div class="pbar" style="max-width:300px;margin:8px auto 0"><div class="pfill pfill-dark" style="width:'+(p.ld/Math.max(p.tot,1)*100)+'%"></div></div>'
-      :'<div class="progress-text">Connecting to Discogs\u2026</div>';
-    root.innerHTML='<div class="card" style="text-align:center;padding:40px"><div style="font-size:16px;font-weight:700;margin-bottom:12px">Fetching your wantlist\u2026</div>'+ph+'</div>';
-    return}
+    root.innerHTML='<div class="card" style="text-align:center;padding:40px"><div style="font-size:16px;font-weight:700;margin-bottom:12px">Fetching your wantlist\u2026</div>'+
+      (p?'<div class="progress-text">Loaded '+p.ld+' of '+p.tot+' items (page '+p.pg+'/'+p.tp+')</div><div class="pbar" style="max-width:300px;margin:8px auto 0"><div class="pfill pfill-dark" style="width:'+(p.ld/Math.max(p.tot,1)*100)+'%"></div></div>':'<div class="progress-text">Connecting to Discogs\u2026</div>')+'</div>';return}
   if(S.loaded&&S.items.length===0){
-    root.innerHTML='<div class="card empty"><div style="font-size:18px;font-weight:700;margin-bottom:8px">Wantlist is empty</div><div>No items found, or the wantlist is set to private.</div><button class="btn-sec" style="margin-top:16px" id="bb">\u2190 Back</button></div>';
+    root.innerHTML='<div class="card empty"><div style="font-size:18px;font-weight:700;margin-bottom:8px">Wantlist is empty</div><button class="btn-sec" style="margin-top:16px" id="bb">\u2190 Back</button></div>';
     $("bb").addEventListener("click",function(){S.loaded=false;render()});return}
 
   var fl=filtered(),fm=fmts(),sh=fl.slice(0,S.vis),more=sh.length<fl.length;
@@ -541,36 +465,23 @@ function render(){
   var tf=totalFound(),hc=hasAnyResults();
   var o='';
 
-  o+='<div class="top-bar"><div style="font-size:13px;color:#666">Loaded <strong>'+S.items.length+'</strong> items for <strong>'+h(S.user)+'</strong></div>'+
-    '<div style="display:flex;gap:8px"><button class="btn-sec btn-sm" id="brl">\u21BB Refresh</button>'+
-    '<button class="btn-sec btn-sm" id="brs">Logout</button></div></div>';
+  o+='<div class="top-bar"><div style="font-size:13px;color:var(--tx2)">Loaded <strong>'+S.items.length+'</strong> items for <strong>'+h(S.user)+'</strong></div>'+
+    '<div style="display:flex;gap:8px"><button class="btn-sec btn-sm" id="brl">\u21BB Refresh</button><button class="btn-sec btn-sm" id="brs">Logout</button></div></div>';
 
   o+='<div class="stats"><div class="stat"><div class="stat-n">'+S.items.length+'</div><div class="stat-l">Wantlist</div></div>'+
     '<div class="stat"><div class="stat-n">'+Object.keys(artc).length+'</div><div class="stat-l">Artists</div></div>';
   if(hc)o+='<div class="stat"><div class="stat-n green">'+tf+'</div><div class="stat-l">Found</div></div>';
   o+='</div>';
 
-  if(hc){
-    o+='<div class="store-stats">';
-    o+='<div class="store-stat'+(S.onlyFound&&!S.filterStore?' on':'')+'" data-sf="all" style="cursor:pointer"><span style="font-size:11px">All found</span> <span class="cnt">'+tf+'</span></div>';
-    CHECKABLE.forEach(function(s){if(!S.results[s.id])return;
-      var fc=storeFoundCount(s.id);
-      if(fc>0)o+='<div class="store-stat'+(S.filterStore===s.id?' on':'')+'" data-sf="'+s.id+'" style="cursor:pointer"><div class="dot" style="background:'+s.color+'"></div>'+h(s.short)+' <span class="cnt">'+fc+'</span></div>'});
-    o+='</div>'}
-
   /* Store selector */
-  o+='<div class="card">';
-  o+='<div class="store-hdr"><div style="font-size:14px;font-weight:700">Stores to check</div>';
-  o+='<div class="store-hdr-btns"><button id="bsa">Select all</button><button id="bsd">Deselect all</button></div></div>';
+  o+='<div class="card"><div class="store-hdr"><div style="font-size:14px;font-weight:700">Stores to check</div>'+
+    '<div class="store-hdr-btns"><button id="bsa">Select all</button><button id="bsd">Deselect all</button></div></div>';
   o+='<div class="store-grid">';
   STORES.forEach(function(s){
-    var checkable=s.type!=="web-tbd";
-    var checked=S.selectedStores[s.id];
-    var tbd=s.type==="web-tbd";
+    var checkable=s.type!=="web-tbd",checked=S.selectedStores[s.id],tbd=s.type==="web-tbd";
     var typeLabel=s.type==="discogs"?"Discogs \u00b7 Slow":s.type==="web"?"Website":s.type==="web-search"?"Search":"Coming soon";
-    o+='<label class="store-opt'+(checked&&checkable?' on':'')+(tbd?' disabled':'')+'" style="'+(tbd?'opacity:.5;cursor:default':'')+'">';
-    o+='<div class="dot" style="background:'+s.color+'"></div>';
-    o+='<div style="flex:1"><div class="sn">'+h(s.name)+'</div><div class="st">'+typeLabel+'</div></div>';
+    o+='<label class="store-opt'+(checked&&checkable?' on':'')+'" style="'+(tbd?'opacity:.5;cursor:default':'')+'">';
+    o+='<div class="dot" style="background:'+s.color+'"></div><div style="flex:1"><div class="sn">'+h(s.name)+'</div><div class="st">'+typeLabel+'</div></div>';
     if(checkable)o+='<input type="checkbox" data-sid="'+s.id+'"'+(checked?' checked':'')+'>';
     o+='</label>'});
   o+='</div>';
@@ -578,40 +489,41 @@ function render(){
   /* Check button + progress */
   o+='<div class="btn-row">';
   if(!S.checking){
-    o+='<button class="btn-green" id="bch">'+(hc?'\u21BB Re-check stores':'\u2713 Check selected stores')+'</button>'}
+    o+='<button class="btn-green" id="bch">'+(hc?'\u21BB Re-check':'\u2713 Check selected stores')+'</button>'}
   else{
     o+='<button class="btn-sec btn-sm" id="bst">\u25A0 Stop</button>';
+    o+='<button class="btn-skip" id="bsk">Skip \u2192</button>';
     o+=spinSvg();
-    o+='<div class="check-progress">';
-    o+='<div class="phase-label" id="chkphase">'+(S.checkPhase==="discogs"?"Loading inventory: ":"Searching: ")+h(S.checkStore)+'</div>';
+    o+='<div class="check-progress"><div class="phase-label" id="chkphase">'+(S.checkPhase==="discogs"?"Loading inventory: ":"Searching: ")+h(S.checkStore)+'</div>';
     o+='<div class="progress-text" id="chkprog">Starting\u2026</div>';
     o+='<div class="pbar"><div class="pfill pfill-green" id="chkfill" style="width:0%"></div></div>';
-    o+='<div class="dig-msg" id="digmsg">'+h(DIG_MSGS[digIdx])+'</div>';
-    o+='</div>'}
+    o+='<div class="dig-msg" id="digmsg">'+h(DIG_MSGS[digIdx])+'</div></div>'}
   o+='</div></div>';
+
+  /* Store filter chips — below the check card */
+  if(hc){
+    o+='<div class="store-stats">';
+    o+='<div class="store-stat'+(S.onlyFound&&!S.filterStore?' on':'')+'" data-sf="all" style="cursor:pointer"><span style="font-size:11px">All found</span> <span class="cnt">'+tf+'</span></div>';
+    CHECKABLE.forEach(function(s){if(!S.results[s.id])return;var fc=storeFoundCount(s.id);
+      if(fc>0)o+='<div class="store-stat'+(S.filterStore===s.id?' on':'')+'" data-sf="'+s.id+'" style="cursor:pointer"><div class="dot" style="background:'+s.color+'"></div>'+h(s.short)+' <span class="cnt">'+fc+'</span></div>'});
+    o+='</div>'}
 
   /* Toolbar */
   o+='<div class="toolbar"><input class="search" id="isrch" placeholder="Search artist, title, label\u2026" value="'+h(S.search)+'" autocomplete="off">';
   fm.forEach(function(f){o+='<button class="fbtn'+(S.format===f?' on':'')+'" data-f="'+h(f)+'">'+(f==="all"?"All":h(f))+'</button>'});
-  o+='<div class="vtog">'+
-    '<button class="vb'+(S.view==="grid"?' on':'')+'" data-v="grid" title="Grid">'+IG+'</button>'+
+  o+='<div class="vtog"><button class="vb'+(S.view==="grid"?' on':'')+'" data-v="grid" title="Grid">'+IG+'</button>'+
     '<button class="vb'+(S.view==="list"?' on':'')+'" data-v="list" title="List">'+IL+'</button></div></div>';
 
-  /* Items */
-  o+='<div class="v-'+S.view+'">';
-  sh.forEach(function(it){o+=renderItem(it)});
-  o+='</div>';
+  o+='<div class="v-'+S.view+'">';sh.forEach(function(it){o+=renderItem(it)});o+='</div>';
   if(more)o+='<div class="more"><button class="btn-sec" id="bmo">Show more ('+(fl.length-sh.length)+' remaining)</button></div>';
   if(fl.length===0)o+='<div class="empty">No items match your filters.</div>';
 
   root.innerHTML=o;
 
-  /* --- EVENT LISTENERS --- */
+  /* Events */
   $("brs").addEventListener("click",function(){S.loaded=false;S.items=[];S.error=null;S.results={};S.invCache={};render()});
   $("brl").addEventListener("click",function(){if(S.user)fetchWL()});
-  var isrch=$("isrch");
-  if(isrch)isrch.addEventListener("input",function(e){S.search=e.target.value;S.vis=PER_PAGE;render();
-    var el=$("isrch");if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length)}});
+  var isrch=$("isrch");if(isrch)isrch.addEventListener("input",function(e){S.search=e.target.value;S.vis=PER_PAGE;render();var el=$("isrch");if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length)}});
   document.querySelectorAll("[data-f]").forEach(function(b){b.addEventListener("click",function(){S.format=b.getAttribute("data-f");S.vis=PER_PAGE;render()})});
   document.querySelectorAll("[data-v]").forEach(function(b){b.addEventListener("click",function(){S.view=b.getAttribute("data-v");render()})});
   document.querySelectorAll("[data-sid]").forEach(function(cb){cb.addEventListener("change",function(){S.selectedStores[cb.getAttribute("data-sid")]=cb.checked;render()})});
@@ -625,7 +537,8 @@ function render(){
     S.vis=PER_PAGE;render()})});
   var bmo=$("bmo");if(bmo)bmo.addEventListener("click",function(){S.vis+=PER_PAGE;render()});
   var bch=$("bch");if(bch)bch.addEventListener("click",function(){checkAll()});
-  var bst=$("bst");if(bst)bst.addEventListener("click",function(){S.cabort=true})}
+  var bst=$("bst");if(bst)bst.addEventListener("click",function(){S.cabort=true});
+  var bsk=$("bsk");if(bsk)bsk.addEventListener("click",function(){S.cskip=true})}
 
 render()
 })();
