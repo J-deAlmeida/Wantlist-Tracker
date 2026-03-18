@@ -1,9 +1,11 @@
 // ============================================================
-// Porto Wantlist Tracker — Cloudflare Worker (v3.0)
+// Porto Wantlist Tracker — Cloudflare Worker (v3.2)
 // ============================================================
-// Two endpoints:
+// Four endpoints:
 //   ?url=<target>          — CORS proxy for store websites
 //   ?inventory=<seller>    — KV-cached Discogs seller inventory
+//   ?vinyldisc=<query>     — Vinyl Disc search proxy
+//   ?wantlist=<user>       — Discogs wantlist proxy (uses DISCOGS_TOKEN)
 //
 // Bindings required:
 //   INVENTORY_KV   — KV namespace for cached inventories
@@ -36,19 +38,93 @@ export default {
 
     const { searchParams } = new URL(request.url);
 
+    // --- Wantlist endpoint ---
+    const wlUser = searchParams.get("wantlist");
+    if (wlUser !== null) {
+      return handleWantlist(wlUser, searchParams.get("page"), env);
+    }
+
     // --- Inventory endpoint ---
     const seller = searchParams.get("inventory");
     if (seller) {
       return handleInventory(seller, env);
     }
 
+    // --- Vinyl Disc search endpoint ---
+    const vinylQuery = searchParams.get("vinyldisc");
+    if (vinylQuery !== null) {
+      return handleVinylDisc(vinylQuery);
+    }
+
     // --- Proxy endpoint ---
     const target = searchParams.get("url");
-    if (!target) return json({ error: "Missing ?url= or ?inventory= parameter" }, 400);
+    if (!target) return json({ error: "Missing ?url=, ?inventory=, ?vinyldisc=, or ?wantlist= parameter" }, 400);
 
     return handleProxy(target);
   },
 };
+
+// ============================================================
+// Wantlist endpoint: proxy Discogs wantlist API
+// ============================================================
+async function handleWantlist(user, pageParam, env) {
+  if (!/^[\w.-]{1,50}$/.test(user)) {
+    return json({ error: "Invalid username" }, 400);
+  }
+  if (!env.DISCOGS_TOKEN) {
+    return json({ error: "Token not configured" }, 500);
+  }
+  const page = parseInt(pageParam || "1", 10);
+  const url = `https://api.discogs.com/users/${encodeURIComponent(user)}/wants?per_page=100&page=${page}&sort=added&sort_order=desc`;
+  try {
+    const r = await fetch(url, {
+      headers: {
+        "Authorization": `Discogs token=${env.DISCOGS_TOKEN}`,
+        "User-Agent": "PortoWantlistTracker/3.2",
+      },
+    });
+    const text = await r.text();
+    let body;
+    try { body = JSON.parse(text); } catch { body = { error: text.slice(0, 200) }; }
+    return new Response(JSON.stringify(body), {
+      status: r.status,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Cache-Control": "no-store",
+      },
+    });
+  } catch (err) {
+    return json({ error: "fetch failed: " + err.message }, 502);
+  }
+}
+
+// ============================================================
+// Vinyl Disc search endpoint
+// ============================================================
+async function handleVinylDisc(query) {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    const resp = await fetch("https://vinyldisc.pt/web/get_page/0", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "Mozilla/5.0 (compatible; PortoWantlistTracker/3.2)",
+      },
+      body: "query=" + encodeURIComponent(query),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    const data = await resp.json();
+    return json({ json: data });
+  } catch (e) {
+    return json({ error: e.message }, 502);
+  }
+}
 
 // ============================================================
 // Inventory endpoint: fetch full Discogs seller inventory
@@ -81,14 +157,13 @@ async function handleInventory(seller, env) {
 
       const resp = await fetch(url, {
         headers: {
-          "User-Agent": "PortoWantlistTracker/3.0",
+          "User-Agent": "PortoWantlistTracker/3.2",
           Accept: "application/vnd.discogs.v2.discogs+json",
         },
       });
 
       if (!resp.ok) {
         if (resp.status === 429) {
-          // Rate limited — wait and retry
           await sleep(2500);
           continue;
         }
@@ -105,7 +180,7 @@ async function handleInventory(seller, env) {
       }
 
       page++;
-      if (page <= pages) await sleep(1100); // respect rate limit
+      if (page <= pages) await sleep(1100);
     }
 
     // Store in KV with TTL
@@ -145,7 +220,7 @@ async function handleProxy(target) {
 
     const resp = await fetch(target, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; PortoWantlistTracker/3.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; PortoWantlistTracker/3.2)",
         Accept: isJson
           ? "application/json"
           : "text/html,application/xhtml+xml",
