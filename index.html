@@ -189,6 +189,9 @@ label{display:block;font-size:13px;font-weight:600;color:var(--tx);margin-bottom
 .src-tab:hover{color:var(--tx2)}
 .src-tab.on{color:var(--tx)}
 .src-tab.on::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--acc)}
+.stale-banner{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;background:var(--amberbg);color:var(--ambertx);font-size:12px;font-weight:500;margin-bottom:16px}
+.stale-banner button{background:none;border:1px solid var(--ambertx);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--ambertx);cursor:pointer;font-family:inherit;white-space:nowrap}
+.stale-banner button:hover{background:rgba(0,0,0,.05)}
 </style>
 </head>
 <body>
@@ -197,7 +200,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--tx);margin-bottom
   <div class="header">
     <div class="logo">Wantlist <span>&times;</span> Tracker</div>
     <div class="sub">Check your wantlist across Porto &amp; Lisbon record stores</div>
-    <div class="ver">v0.8.0 &mdash; 2026-03-22</div>
+    <div class="ver">v0.9.0 &mdash; 2026-03-22</div>
   </div>
   <div id="root"></div>
   <div style="text-align:center;padding:40px 16px 20px;font-size:11px;color:var(--tx3)">Visit your neighborhood record stores and shop locally.<br><a href="https://github.com/J-deAlmeida/Discogs-Wantlist-Tracker/blob/main/FAQ.md" target="_blank" style="color:var(--tx3);text-decoration:underline;text-underline-offset:2px">FAQ</a> &middot; &copy; 2026 Geminus Dancing Studios. Ardazubre, Baixo Mondego.</div>
@@ -225,6 +228,7 @@ function norm(s){return(s||"").toLowerCase()
   .replace(/[^a-z0-9]/g," ").replace(/\s+/g," ").trim()}
 function artFirst(s){return(s||"").replace(/\s*\(\d+\)\s*$/,"").split(",")[0].trim()}
 function elapsedStr(ms){var s=Math.round(ms/1000);if(s<60)return s+"s";return Math.floor(s/60)+"m "+("0"+(s%60)).slice(-2)+"s"}
+function agoStr(ts){if(!ts)return"";var d=Date.now()-ts;var m=Math.floor(d/60000);if(m<1)return"just now";if(m<60)return m+"m ago";var hr=Math.floor(m/60);if(hr<24)return hr+"h ago";var dy=Math.floor(hr/24);return dy+"d ago"}
 function detectAndParse(text,filename){
   var trimmed=text.trimStart();
   if((filename||"").toLowerCase().endsWith(".xml")||trimmed.startsWith("<?xml")||trimmed.indexOf("<plist")!==-1)
@@ -468,15 +472,58 @@ var S={items:[],loaded:false,loading:false,error:null,progress:null,
   user:"",
   source:"discogs",mbUser:"",mbCollections:[],mbCollectionIds:[],mbLoading:false,mbError:null,
   csvText:"",csvPreview:null,loadingLabel:"",
-  addingSource:false,sources:[]};
+  addingSource:false,sources:[],
+  lastChecked:null};
 CHECKABLE.forEach(function(s){S.selectedStores[s.id]=!!s.defOn});
 var _ks=0;
 function isDuplicate(it){
   if(it.id)return S.items.some(function(x){return x.id===it.id});
   var na=norm(it.artist),nt=norm(it.title);
   return S.items.some(function(x){return norm(x.artist)===na&&norm(x.title)===nt})}
-try{S.user=sessionStorage.getItem("dg_u")||"";S.mbUser=sessionStorage.getItem("mb_u")||""}catch(e){}
-function saveCreds(){try{sessionStorage.setItem("dg_u",S.user);sessionStorage.setItem("mb_u",S.mbUser)}catch(e){}}
+
+/* ========== PERSISTENCE ========== */
+var SAVE_KEY="wt_state_v1";
+function saveState(){
+  try{
+    var data={v:1,user:S.user,mbUser:S.mbUser,source:S.source,sources:S.sources,
+      items:S.items,loaded:S.loaded,results:S.results,
+      selectedStores:S.selectedStores,view:S.view,
+      cityPorto:S.cityPorto,cityLisbon:S.cityLisbon,
+      lastChecked:S.lastChecked,savedAt:Date.now()};
+    localStorage.setItem(SAVE_KEY,JSON.stringify(data))
+  }catch(e){/* quota exceeded or private browsing */}}
+function loadState(){
+  try{
+    var raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return false;
+    var d=JSON.parse(raw);
+    if(!d||d.v!==1||!d.items||!d.items.length)return false;
+    S.user=d.user||"";S.mbUser=d.mbUser||"";
+    S.source=d.source||"discogs";S.sources=d.sources||[];
+    S.items=d.items;S.loaded=true;
+    S.results=d.results||{};
+    /* Merge saved store selections with defaults for any new stores */
+    if(d.selectedStores){for(var k in d.selectedStores)S.selectedStores[k]=d.selectedStores[k]}
+    S.view=d.view||"grid";
+    S.cityPorto=d.cityPorto!==undefined?d.cityPorto:true;
+    S.cityLisbon=d.cityLisbon!==undefined?d.cityLisbon:true;
+    S.lastChecked=d.lastChecked||null;
+    return true
+  }catch(e){return false}}
+function clearSaved(){
+  try{localStorage.removeItem(SAVE_KEY)}catch(e){}}
+
+/* Migrate from old sessionStorage credentials */
+try{
+  if(!loadState()){
+    S.user=sessionStorage.getItem("dg_u")||"";
+    S.mbUser=sessionStorage.getItem("mb_u")||""
+  }
+  /* Clean up old keys */
+  sessionStorage.removeItem("dg_u");sessionStorage.removeItem("mb_u")
+}catch(e){}
+
+function saveCreds(){saveState()}
 
 /* ========== HELPERS ========== */
 function h(s){var d=document.createElement("div");d.textContent=s||"";return d.innerHTML}
@@ -659,7 +706,7 @@ async function fetchMBCollection(){
     S.sources=S.sources.concat(["MusicBrainz \u00b7 "+colNames]);
     S.addingSource=false;S.loaded=true
   }catch(e){S.error=e.message;S.addingSource=false}
-  S.loading=false;S.progress=null;render()}
+  S.loading=false;S.progress=null;S.lastChecked=null;saveState();render()}
 
 /* ========== DISCOGS WANTLIST ========== */
 async function fetchWL(){
@@ -688,7 +735,7 @@ async function fetchWL(){
     else{S.items=newItems}
     S.sources=S.sources.concat(["Discogs \u00b7 "+S.user]);
     S.addingSource=false;S.loaded=true
-  }catch(e){S.error=e.message;S.addingSource=false}S.loading=false;S.progress=null;render()}
+  }catch(e){S.error=e.message;S.addingSource=false}S.loading=false;S.progress=null;S.lastChecked=null;saveState();render()}
 
 /* ========== DISCOGS SELLER ========== */
 /* ========== DISCOGS SELLER (via worker KV cache) ========== */
@@ -877,7 +924,8 @@ async function checkAll(forceRecheck){
     await checkDiscogsStore(discogsStores[i]);
     S.storesDone++;S.checkLog.push({name:discogsStores[i].short,found:storeFoundCount(discogsStores[i].id)});
     render()}
-  S.checking=false;S.checkPhase="";S.checkStore="";S.checkProg=null;render()}
+  S.checking=false;S.checkPhase="";S.checkStore="";S.checkProg=null;
+  S.lastChecked=Date.now();saveState();render()}
 
 function updateCheckUI(){
   var el=$("chkphase");if(el){
@@ -1181,7 +1229,7 @@ function wireLoginCard(){
       if(merging){newItems=newItems.filter(function(it){return!isDuplicate(it)});S.items=S.items.concat(newItems)}
       else{S.items=newItems;S.results={};S.invCache={};S.sources=[];S.search="";S.format="all";S.onlyFound=false;S.filterStores={};S.vis=PER_PAGE;}
       var srcLabel=S.csvPreview.format==="itunes"?"iTunes":"CSV";
-      S.sources=S.sources.concat([srcLabel]);S.addingSource=false;S.loaded=true;render()}});
+      S.sources=S.sources.concat([srcLabel]);S.addingSource=false;S.loaded=true;S.lastChecked=null;saveState();render()}});
   var bcsvback=$("bcsvback");
   if(bcsvback)bcsvback.addEventListener("click",function(){S.csvPreview=null;render()})}
 
@@ -1196,15 +1244,24 @@ function render(){
       (p?'<div class="progress-text">Loaded '+p.ld+' of '+p.tot+' items (page '+p.pg+'/'+p.tp+')</div><div class="pbar" style="max-width:300px;margin:8px auto 0"><div class="pfill pfill-dark" style="width:'+(p.ld/Math.max(p.tot,1)*100)+'%"></div></div>':'<div class="progress-text">Connecting\u2026</div>')+'</div>';return}
   if(S.loaded&&S.items.length===0){
     root.innerHTML='<div class="card empty"><div style="font-size:18px;font-weight:700;margin-bottom:8px">Wantlist is empty</div><button class="btn-sec" style="margin-top:16px" id="bb">\u2190 Back</button></div>';
-    $("bb").addEventListener("click",function(){S.loaded=false;render()});return}
+    $("bb").addEventListener("click",function(){S.loaded=false;clearSaved();render()});return}
 
   var fl=filtered(),sh=fl.slice(0,S.vis),more=sh.length<fl.length;
   var artc={};S.items.forEach(function(i){artc[i.artist]=true});
   var tf=totalFound(),hc=hasAnyResults();
   var o='';
 
+  /* Stale results banner */
+  if(hc&&S.lastChecked&&!S.checking){
+    var staleMs=Date.now()-S.lastChecked;
+    var staleHrs=staleMs/(1000*60*60);
+    if(staleHrs>=1){
+      o+='<div class="stale-banner"><span>Results from <strong>'+agoStr(S.lastChecked)+'</strong> \u2014 stock may have changed</span><button id="bstale">Re-check</button></div>'}}
+
   var srcSummary=S.sources.length?S.sources.join(" + "):(S.source==="mb"?"MusicBrainz":S.source==="csv"?"CSV":"Discogs");
-  o+='<div class="top-bar"><div style="font-size:13px;color:var(--tx2)">Loaded <strong>'+S.items.length+'</strong> items \u00b7 <strong>'+h(srcSummary)+'</strong></div>'+
+  o+='<div class="top-bar"><div style="font-size:13px;color:var(--tx2)">Loaded <strong>'+S.items.length+'</strong> items \u00b7 <strong>'+h(srcSummary)+'</strong>'+
+    (S.lastChecked&&hc?' \u00b7 <span style="color:var(--tx3)">checked '+agoStr(S.lastChecked)+'</span>':'')+
+    '</div>'+
     '<div style="display:flex;gap:8px">'+
     (S.sources.length<=1?'<button class="btn-sec btn-sm" id="brl">\u21BB Refresh</button>':'')+
     '<button class="btn-sec btn-sm" id="badd">+ Add</button>'+
@@ -1309,7 +1366,7 @@ function render(){
   if(S.addingSource)wireLoginCard();
 
   /* Events */
-  $("brs").addEventListener("click",function(){S.loaded=false;S.items=[];S.error=null;S.results={};S.invCache={};S.sources=[];S.addingSource=false;render()});
+  $("brs").addEventListener("click",function(){S.loaded=false;S.items=[];S.error=null;S.results={};S.invCache={};S.sources=[];S.addingSource=false;S.lastChecked=null;clearSaved();render()});
   var badd=$("badd");if(badd)badd.addEventListener("click",function(){S.addingSource=true;S.error=null;render()});
   var bexp=$("bexp");if(bexp)bexp.addEventListener("click",exportCSV);
   var brl=$("brl");if(brl)brl.addEventListener("click",function(){
@@ -1318,17 +1375,17 @@ function render(){
     else if(S.user)fetchWL()});
   var isrch=$("isrch");if(isrch)isrch.addEventListener("input",function(e){S.search=e.target.value;S.vis=PER_PAGE;render();var el=$("isrch");if(el){el.focus();el.setSelectionRange(el.value.length,el.value.length)}});
   document.querySelectorAll("[data-f]").forEach(function(b){b.addEventListener("click",function(){S.format=b.getAttribute("data-f");S.vis=PER_PAGE;render()})});
-  document.querySelectorAll("[data-v]").forEach(function(b){b.addEventListener("click",function(){S.view=b.getAttribute("data-v");render()})});
-  document.querySelectorAll("[data-sid]").forEach(function(cb){cb.addEventListener("change",function(){S.selectedStores[cb.getAttribute("data-sid")]=cb.checked;render()})});
+  document.querySelectorAll("[data-v]").forEach(function(b){b.addEventListener("click",function(){S.view=b.getAttribute("data-v");saveState();render()})});
+  document.querySelectorAll("[data-sid]").forEach(function(cb){cb.addEventListener("change",function(){S.selectedStores[cb.getAttribute("data-sid")]=cb.checked;saveState();render()})});
   var bstoggle=$("bstoggle");if(bstoggle)bstoggle.addEventListener("click",function(){
     if(S.storesOpen){
       var g=document.querySelector(".store-grid");
       if(g){g.classList.add("closing");g.addEventListener("animationend",function(){S.storesOpen=false;render()},{once:true})}
       else{S.storesOpen=false;render()}}
     else{S.storesOpen=true;S._storesJustOpened=true;render();S._storesJustOpened=false;}});
-  var bsa=$("bsa");if(bsa)bsa.addEventListener("click",function(){CHECKABLE.forEach(function(s){if((s.city==="porto"&&S.cityPorto)||(s.city==="lisbon"&&S.cityLisbon))S.selectedStores[s.id]=true});render()});
-  var bsd=$("bsd");if(bsd)bsd.addEventListener("click",function(){CHECKABLE.forEach(function(s){if((s.city==="porto"&&S.cityPorto)||(s.city==="lisbon"&&S.cityLisbon))S.selectedStores[s.id]=false});render()});
-  document.querySelectorAll("[data-ct]").forEach(function(b){b.addEventListener("click",function(){var c=b.getAttribute("data-ct");if(c==="porto")S.cityPorto=!S.cityPorto;else S.cityLisbon=!S.cityLisbon;if(!S.cityPorto&&!S.cityLisbon){if(c==="porto")S.cityLisbon=true;else S.cityPorto=true}render()})});
+  var bsa=$("bsa");if(bsa)bsa.addEventListener("click",function(){CHECKABLE.forEach(function(s){if((s.city==="porto"&&S.cityPorto)||(s.city==="lisbon"&&S.cityLisbon))S.selectedStores[s.id]=true});saveState();render()});
+  var bsd=$("bsd");if(bsd)bsd.addEventListener("click",function(){CHECKABLE.forEach(function(s){if((s.city==="porto"&&S.cityPorto)||(s.city==="lisbon"&&S.cityLisbon))S.selectedStores[s.id]=false});saveState();render()});
+  document.querySelectorAll("[data-ct]").forEach(function(b){b.addEventListener("click",function(){var c=b.getAttribute("data-ct");if(c==="porto")S.cityPorto=!S.cityPorto;else S.cityLisbon=!S.cityLisbon;if(!S.cityPorto&&!S.cityLisbon){if(c==="porto")S.cityLisbon=true;else S.cityPorto=true}saveState();render()})});
   document.querySelectorAll("[data-sf]").forEach(function(el){el.addEventListener("click",function(){
     var sf=el.getAttribute("data-sf");
     if(sf==="all"){S.filterStores={};S.onlyFound=!S.onlyFound}
@@ -1342,6 +1399,7 @@ function render(){
   var boos=$("boos");if(boos)boos.addEventListener("click",function(){S.hideOos=!S.hideOos;S.onlyFound=S.hideOos||S.onlyFound;S.vis=PER_PAGE;render()});
   var bch=$("bch");if(bch)bch.addEventListener("click",function(){checkAll(false)});
   var brch=$("brch");if(brch)brch.addEventListener("click",function(){checkAll(true)});
+  var bstale=$("bstale");if(bstale)bstale.addEventListener("click",function(){checkAll(true)});
   var bst=$("bst");if(bst)bst.addEventListener("click",function(){S.cabort=true});
   var bsk=$("bsk");if(bsk)bsk.addEventListener("click",function(){S.cskip=true})}
 
