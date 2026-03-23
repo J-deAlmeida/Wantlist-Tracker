@@ -202,7 +202,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--tx);margin-bottom
   <div class="header">
     <div class="logo">Wantlist <span>&times;</span> Tracker</div>
     <div class="sub">Check your wantlist across Porto &amp; Lisbon record stores</div>
-    <div class="ver">v0.12.0 &mdash; 2026-03-23</div>
+    <div class="ver">v0.13.0 &mdash; 2026-03-23</div>
   </div>
   <div id="root"></div>
   <div style="text-align:center;padding:40px 16px 20px;font-size:11px;color:var(--tx3)">Visit your neighborhood record stores and shop locally.<br><a href="https://github.com/J-deAlmeida/Discogs-Wantlist-Tracker/blob/main/FAQ.md" target="_blank" style="color:var(--tx3);text-decoration:underline;text-underline-offset:2px">FAQ</a> &middot; &copy; 2026 Geminus Dancing Studios. Ardazubre, Baixo Mondego.</div>
@@ -316,12 +316,17 @@ var ADAPTERS={
   'magento':{
     getCheckUrl:function(s,it){return s.searchUrl.replace('{{titleQuery}}',encodeURIComponent(qryTitle(it)))},
     detect:function(s,j,it){if(!j.bodyText)return{s:'err'};var b=norm(j.bodyText),ti=norm(it.title),ai=norm(artFirst(it.artist));var itemMatch=j.bodyText.match(/(\d+)\s*Items?\b/i);var itemCount=itemMatch?parseInt(itemMatch[1]):0;if(itemCount===0||b.indexOf('your search returned no results')!==-1)return{s:'no'};if(ti.length<5||ai.length<3)return{s:'no'};if(b.indexOf(ti)===-1||b.indexOf(ai)===-1)return{s:'no'};var oos=/out of stock|esgotado|fora de stock|sem stock/i.test(j.bodyText);return{s:'found',oos:oos}},
-    getStoreUrl:function(s,it){return s.searchUrl.replace('{{titleQuery}}',encodeURIComponent(qry(it)))}}
+    getStoreUrl:function(s,it){return s.searchUrl.replace('{{titleQuery}}',encodeURIComponent(qry(it)))}},
+  'discogs-market':{
+    getEndpoint:function(s,it){if(!it.id)return null;return WORKER+'?market='+encodeURIComponent(it.id)},
+    detect:function(s,j,it){if(!j.found&&j.error)return{s:'err'};return{s:j.found?'found':'no'}},
+    getStoreUrl:function(s,it){if(!it.id)return'https://www.discogs.com/sell';return'https://www.discogs.com/sell/release/'+it.id+'?ships_from=PT&ev=rb'}}
 };
 
 var PLATFORM_LABELS={
   'common-ground':'Catalogue search',
   'discogs':'Discogs seller',
+  'discogs-market':'Discogs marketplace \u00b7 PT',
   'shopify-suggest':'Catalogue search',
   'text-match':'Website',
   'woocommerce':'Website',
@@ -380,6 +385,10 @@ var STORES=[
    seller:"PIRANHACD",color:"#993556",defOn:false,
    logo:"img/piranha.png",url:"https://www.discogs.com/seller/PIRANHACD/profile",
    map:"https://www.google.com/maps/search/Piranha+Record+Store+Porto"},
+
+  {id:"dgpt",name:"Discogs Market",short:"DG\u00b7PT",platform:"discogs-market",city:"porto",
+   color:"#f47920",defOn:false,concurrent:1,delay:1500,
+   url:"https://www.discogs.com/sell",map:null},
 
   {id:"louie",name:"Louie Louie",short:"Louie",platform:"magento",color:"#185FA5",city:"porto",
    logo:"img/louie.png",url:"https://www.louielouie.pt",defOn:false,slow:true,
@@ -833,7 +842,7 @@ async function checkGraphQLStore(store){
 
 /* ========== DISCOGS ID RESOLUTION ========== */
 async function resolveDiscogsIds(){
-  var hasDiscogs=CHECKABLE.some(function(s){return s.platform==="discogs"&&S.selectedStores[s.id]});
+  var hasDiscogs=CHECKABLE.some(function(s){return (s.platform==="discogs"||s.platform==="discogs-market")&&S.selectedStores[s.id]});
   if(!hasDiscogs)return;
   var toResolve=S.items.filter(function(it){return!it.id});
   if(!toResolve.length)return;
@@ -1301,7 +1310,9 @@ function render(){
     portoStores.forEach(renderStoreCard);
     if(bothCities)o+='<div class="store-city-hdr">Lisbon</div>';
     lisbonStores.forEach(renderStoreCard);
-    o+='</div>';}
+    o+='</div>';
+    o+='<div style="text-align:right;padding:6px 2px 0"><a href="https://github.com/J-deAlmeida/Discogs-Wantlist-Tracker/issues/new?title=Store+suggestion&body=**Store+name:**+%0A**City:**+Porto+%2F+Lisbon%0A**Website:**+%0A**Notes:**+" target="_blank" style="font-size:11px;color:var(--tx3);text-decoration:none;opacity:.8">+ Suggest a store</a></div>';
+  }
 
   /* Check button + progress */
   var unchecked=CHECKABLE.filter(function(s){return S.selectedStores[s.id]&&!S.results[s.id]}).length;
