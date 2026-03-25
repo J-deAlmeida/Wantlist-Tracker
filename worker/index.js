@@ -1,5 +1,5 @@
 // ============================================================
-// Porto Wantlist Tracker — Cloudflare Worker (v3.3)
+// Porto Wantlist Tracker — Cloudflare Worker (v3.4)
 // ============================================================
 // Endpoints:
 //   ?url=<target>          — CORS proxy for store websites
@@ -7,6 +7,7 @@
 //   ?vinyldisc=<query>     — Vinyl Disc search proxy
 //   ?wantlist=<user>       — Discogs wantlist proxy (uses DISCOGS_TOKEN)
 //   ?catalog=<storeId>     — Return pre-fetched store catalog from KV
+//   ?market=<releaseId>    — Check Discogs marketplace for PT listings (2h KV cache)
 //
 // Scheduled (cron every 6h):
 //   Fetches full Shopify catalogs for configured stores → KV
@@ -91,9 +92,15 @@ export default {
       return handleResolve(resolveQuery, env);
     }
 
+    // --- Marketplace PT endpoint ---
+    const marketId = searchParams.get("market");
+    if (marketId !== null) {
+      return handleMarket(marketId, env);
+    }
+
     // --- Proxy endpoint ---
     const target = searchParams.get("url");
-    if (!target) return json({ error: "Missing ?url=, ?inventory=, ?vinyldisc=, ?wantlist=, ?catalog=, or ?resolve= parameter" }, 400);
+    if (!target) return json({ error: "Missing ?url=, ?inventory=, ?vinyldisc=, ?wantlist=, ?catalog=, ?resolve=, or ?market= parameter" }, 400);
 
     return handleProxy(target);
   },
@@ -430,6 +437,44 @@ async function handleResolve(query, env) {
     return json({ id: id || null });
   } catch (err) {
     return json({ id: null, error: err.message });
+  }
+}
+
+// ============================================================
+// Marketplace PT endpoint: check Discogs marketplace for PT listings
+// ============================================================
+async function handleMarket(releaseId, env) {
+  if (!/^\d{1,10}$/.test(releaseId)) return json({ found: false });
+
+  const cacheKey = `mkt:${releaseId}`;
+  try {
+    const cached = await env.INVENTORY_KV.get(cacheKey, "json");
+    if (cached) return json({ ...cached, cached: true });
+  } catch (e) {}
+
+  try {
+    const url = `https://api.discogs.com/marketplace/search?release_id=${encodeURIComponent(releaseId)}&ships_from=Portugal&per_page=50`;
+    const r = await fetch(url, {
+      headers: {
+        "Authorization": `Discogs token=${env.DISCOGS_TOKEN}`,
+        "User-Agent": "PortoWantlistTracker/3.4",
+      },
+    });
+    if (!r.ok) return json({ found: false });
+    const data = await r.json();
+    const results = data.results || [];
+    // Filter for Portugal seller location (client-side safety net if ships_from param is ignored)
+    const count = results.filter((item) => {
+      const loc = (item.seller?.location || "").toLowerCase();
+      return loc.includes("portugal") || loc === "pt";
+    }).length;
+    const result = { found: count > 0, count };
+    try {
+      await env.INVENTORY_KV.put(cacheKey, JSON.stringify(result), { expirationTtl: 2 * 60 * 60 });
+    } catch (e) {}
+    return json(result);
+  } catch (err) {
+    return json({ found: false, error: err.message });
   }
 }
 
