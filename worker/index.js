@@ -420,7 +420,11 @@ async function handleResolve(query, env) {
   const cacheKey = "resolve:" + (artist + ":" + title).toLowerCase().slice(0, 80);
   try {
     const cached = await env.INVENTORY_KV.get(cacheKey);
-    if (cached !== null) return json({ id: cached || null, cached: true });
+    if (cached !== null) {
+      // Handle both new JSON format {id,thumb} and legacy plain-string format
+      try { const obj = JSON.parse(cached); return json({ ...obj, cached: true }); }
+      catch (_) { return json({ id: cached || null, cached: true }); }
+    }
   } catch (e) {}
 
   try {
@@ -431,17 +435,18 @@ async function handleResolve(query, env) {
     const r = await fetch(url, {
       headers: {
         "Authorization": `Discogs token=${env.DISCOGS_TOKEN}`,
-        "User-Agent": "PortoWantlistTracker/3.3",
+        "User-Agent": "PortoWantlistTracker/3.4",
       },
     });
     if (!r.ok) return json({ id: null });
     const data = await r.json();
     const results = data.results || [];
     const id = results.length > 0 ? String(results[0].id) : "";
+    const thumb = results.length > 0 ? (results[0].cover_image || results[0].thumb || "") : "";
     try {
-      await env.INVENTORY_KV.put(cacheKey, id, { expirationTtl: 7 * 24 * 60 * 60 });
+      await env.INVENTORY_KV.put(cacheKey, JSON.stringify({ id: id || null, thumb: thumb || null }), { expirationTtl: 7 * 24 * 60 * 60 });
     } catch (e) {}
-    return json({ id: id || null });
+    return json({ id: id || null, thumb: thumb || null });
   } catch (err) {
     return json({ id: null, error: err.message });
   }

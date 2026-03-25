@@ -866,7 +866,7 @@ async function resolveDiscogsIds(){
     try{
       var q=encodeURIComponent(artFirst(it.artist)+"\n"+it.title);
       var r=await fetch(WORKER+"?resolve="+q);
-      if(r.ok){var d=await r.json();if(d.id){it.id=d.id;it._key=d.id}}
+      if(r.ok){var d=await r.json();if(d.id){it.id=d.id;it._key=d.id;if(d.thumb&&!it.thumb)it.thumb=d.thumb}}
     }catch(e){}
     done++;
     S.checkProg={done:done,tot:tot,found:0};
