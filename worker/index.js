@@ -8,6 +8,7 @@
 //   ?wantlist=<user>       — Discogs wantlist proxy (uses DISCOGS_TOKEN)
 //   ?catalog=<storeId>     — Return pre-fetched store catalog from KV
 //   ?market=<releaseId>    — Check Discogs marketplace for PT listings (2h KV cache)
+//   ?suggest (POST)        — Create a GitHub issue for store suggestions (needs GITHUB_TOKEN)
 //
 // Scheduled (cron every 6h):
 //   Fetches full Shopify catalogs for configured stores → KV
@@ -15,6 +16,7 @@
 // Bindings required:
 //   INVENTORY_KV   — KV namespace for cached inventories
 //   DISCOGS_TOKEN  — Secret: Discogs personal access token
+//   GITHUB_TOKEN   — Secret: GitHub PAT with issues write scope
 // ============================================================
 
 // Shopify stores to pre-fetch on schedule
@@ -96,6 +98,11 @@ export default {
     const marketId = searchParams.get("market");
     if (marketId !== null) {
       return handleMarket(marketId, env);
+    }
+
+    // --- Store suggestion endpoint (POST) ---
+    if (searchParams.has("suggest")) {
+      return handleSuggest(request, env);
     }
 
     // --- Proxy endpoint ---
@@ -437,6 +444,58 @@ async function handleResolve(query, env) {
     return json({ id: id || null });
   } catch (err) {
     return json({ id: null, error: err.message });
+  }
+}
+
+// ============================================================
+// Store suggestion endpoint: create a GitHub issue
+// ============================================================
+async function handleSuggest(request, env) {
+  if (request.method !== "POST") return json({ error: "POST required" }, 405);
+  if (!env.GITHUB_TOKEN) return json({ error: "GITHUB_TOKEN not configured" }, 500);
+
+  let body;
+  try { body = await request.json(); } catch (e) { return json({ error: "Invalid JSON" }, 400); }
+
+  const name = (body.name || "").trim();
+  const city = (body.city || "").trim();
+  const website = (body.website || "").trim();
+  const notes = (body.notes || "").trim();
+  if (!name) return json({ error: "Store name is required" }, 400);
+
+  const issueBody = [
+    `**Store name:** ${name}`,
+    `**City:** ${city || "Not specified"}`,
+    `**Website:** ${website || "Not provided"}`,
+    notes ? `**Notes:** ${notes}` : "",
+    "",
+    "---",
+    "_Submitted via Wantlist Tracker_",
+  ].filter(Boolean).join("\n");
+
+  try {
+    const r = await fetch("https://api.github.com/repos/J-deAlmeida/Discogs-Wantlist-Tracker/issues", {
+      method: "POST",
+      headers: {
+        "Authorization": `token ${env.GITHUB_TOKEN}`,
+        "User-Agent": "PortoWantlistTracker/3.4",
+        "Content-Type": "application/json",
+        "Accept": "application/vnd.github.v3+json",
+      },
+      body: JSON.stringify({
+        title: `Store suggestion: ${name}`,
+        body: issueBody,
+        labels: ["store-suggestion"],
+      }),
+    });
+    if (!r.ok) {
+      const err = await r.text();
+      return json({ error: "GitHub API error (" + r.status + ")", detail: err }, 500);
+    }
+    const issue = await r.json();
+    return json({ ok: true, url: issue.html_url });
+  } catch (err) {
+    return json({ error: err.message }, 500);
   }
 }
 

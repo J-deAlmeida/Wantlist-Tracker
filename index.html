@@ -439,7 +439,7 @@ var S={items:[],loaded:false,loading:false,error:null,progress:null,
   /* results: { storeId: { releaseId: {s:"found"|"no"|"err", oos:bool} } } */
   results:{},catalogCache:{},invCache:{},onlyFound:false,filterStores:{},hideOos:false,expanded:{},
   cityPorto:true,cityLisbon:true,
-  user:"",
+  user:"",suggestOpen:false,suggestSending:false,suggestMsg:null,
   source:"discogs",mbUser:"",mbCollections:[],mbCollectionIds:[],mbLoading:false,mbError:null,
   csvText:"",csvPreview:null,loadingLabel:"",
   addingSource:false,sources:[],
@@ -1311,7 +1311,22 @@ function render(){
     if(bothCities)o+='<div class="store-city-hdr">Lisbon</div>';
     lisbonStores.forEach(renderStoreCard);
     o+='</div>';
-    o+='<div style="text-align:right;padding:6px 2px 0"><a href="https://github.com/J-deAlmeida/Discogs-Wantlist-Tracker/issues/new?title=Store+suggestion&body=**Store+name:**+%0A**City:**+Porto+%2F+Lisbon%0A**Website:**+%0A**Notes:**+" target="_blank" style="font-size:11px;color:var(--tx3);text-decoration:none;opacity:.8">+ Suggest a store</a></div>';
+    if(S.suggestMsg&&!S.suggestOpen){
+      o+='<div style="text-align:right;padding:6px 2px 0"><span style="font-size:11px;color:var(--grn)">'+h(S.suggestMsg)+'</span></div>'
+    }else if(!S.suggestOpen){
+      o+='<div style="text-align:right;padding:6px 2px 0"><a href="#" id="bsuggest" style="font-size:11px;color:var(--tx3);text-decoration:none;opacity:.8">+ Suggest a store</a></div>'
+    }else{
+      o+='<div style="margin-top:12px;padding:12px 0;border-top:1px solid var(--bd2)">';
+      o+='<div style="font-size:13px;font-weight:700;margin-bottom:10px">Suggest a store</div>';
+      o+='<div class="form-row">';
+      o+='<div><label for="sug-name">Store name *</label><input class="inp" id="sug-name" placeholder="e.g. Vinyl Paradise"></div>';
+      o+='<div><label for="sug-city">City</label><select class="inp" id="sug-city"><option value="Porto">Porto</option><option value="Lisbon">Lisbon</option><option value="Other">Other</option></select></div>';
+      o+='</div>';
+      o+='<div style="margin-top:8px"><label for="sug-url">Website</label><input class="inp" id="sug-url" placeholder="https://\u2026"></div>';
+      o+='<div style="margin-top:8px"><label for="sug-notes">Notes</label><textarea class="inp" id="sug-notes" rows="2" placeholder="Anything helpful\u2026" style="resize:vertical;min-height:40px"></textarea></div>';
+      o+='<div class="btn-row"><button class="btn-sec" id="sug-submit"'+(S.suggestSending?' disabled':'')+'>'+( S.suggestSending?'Sending\u2026':'Submit')+'</button><button class="btn-sec btn-sm" id="sug-cancel">Cancel</button></div>';
+      o+='</div>'
+    }
   }
 
   /* Check button + progress */
@@ -1412,7 +1427,23 @@ function render(){
   var brch=$("brch");if(brch)brch.addEventListener("click",function(){checkAll(true)});
   var bstale=$("bstale");if(bstale)bstale.addEventListener("click",function(){checkAll(true)});
   var bst=$("bst");if(bst)bst.addEventListener("click",function(){S.cabort=true});
-  var bsk=$("bsk");if(bsk)bsk.addEventListener("click",function(){S.cskip=true})}
+  var bsk=$("bsk");if(bsk)bsk.addEventListener("click",function(){S.cskip=true});
+  var bsuggest=$("bsuggest");if(bsuggest)bsuggest.addEventListener("click",function(e){e.preventDefault();S.suggestOpen=true;S.suggestMsg=null;render()});
+  var sugcancel=$("sug-cancel");if(sugcancel)sugcancel.addEventListener("click",function(){S.suggestOpen=false;S.suggestMsg=null;render()});
+  var sugsubmit=$("sug-submit");if(sugsubmit)sugsubmit.addEventListener("click",function(){
+    var name=($("sug-name")||{}).value||"";
+    var city=($("sug-city")||{}).value||"Porto";
+    var website=($("sug-url")||{}).value||"";
+    var notes=($("sug-notes")||{}).value||"";
+    if(!name.trim()){$("sug-name").focus();return}
+    S.suggestSending=true;render();
+    fetch(WORKER+"?suggest",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({name:name.trim(),city:city,website:website.trim(),notes:notes.trim()})
+    }).then(function(r){return r.json()}).then(function(d){
+      S.suggestSending=false;
+      if(d.ok){S.suggestOpen=false;S.suggestMsg="\u2713 Submitted \u2014 thanks!";render();setTimeout(function(){S.suggestMsg=null;render()},3000)}
+      else{S.suggestMsg=null;S.error="Suggestion failed: "+(d.error||"unknown error");render()}
+    }).catch(function(e){S.suggestSending=false;S.suggestMsg=null;S.error="Suggestion failed: "+e.message;render()})})}
 
 render()
 })();
